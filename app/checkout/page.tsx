@@ -26,9 +26,12 @@ function CheckoutContent() {
   const params = useSearchParams();
 
   const productName = params.get("name") || "Товар из Y2K Store";
-  const productPrice = params.get("price") || "0 UZS";
+  const productPriceRaw = params.get("price") || "0 UZS";
   const productSizesRaw = params.get("sizes") || "XS, S, M, L";
   const productImg = params.get("img") || "/products/y2k-tee.jpg";
+
+  // Очищаем цену от UZS для копирования только чистой суммы (цифр)
+  const numericPrice = productPriceRaw.replace(" UZS", "");
 
   // Разбиваем строку размеров на массив
   const availableSizes = productSizesRaw
@@ -96,8 +99,8 @@ function CheckoutContent() {
       formData.append("apartment", form.apartment);
       formData.append("landmark", form.landmark);
       formData.append("productName", productName);
-      formData.append("size", selectedSize); // Отправляем выбранный размер
-      formData.append("price", productPrice);
+      formData.append("size", selectedSize);
+      formData.append("price", productPriceRaw);
       formData.append("receipt", receiptFile);
 
       const res = await fetch("/api/checkout", {
@@ -179,7 +182,7 @@ function CheckoutContent() {
                     return (
                       <button
                         key={size}
-                        type="button" // 🔥 ВАЖНО: тип button, чтобы не отправлялась форма
+                        type="button"
                         onClick={() => setSelectedSize(size)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 border ${
                           isSelected
@@ -194,8 +197,10 @@ function CheckoutContent() {
                 </div>
               </div>
 
+              {/* Цена с защитой слова UZS от выделения */}
               <p className="text-cyan-300 font-extrabold text-xl tracking-widest drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]">
-                {productPrice}
+                <span className="select-all">{numericPrice}</span>{" "}
+                <span className="select-none">UZS</span>
               </p>
 
               <div className="mt-6 pt-6 border-t border-white/10 space-y-3 text-xs text-zinc-400">
@@ -209,7 +214,9 @@ function CheckoutContent() {
                 </div>
                 <div className="flex justify-between text-zinc-100 font-bold text-sm pt-3 border-t border-white/10">
                   <span>Итого к оплате</span>
-                  <span className="text-pink-400 tracking-wider">{productPrice}</span>
+                  <span className="text-pink-400 tracking-wider">
+                    {numericPrice} <span className="select-none">UZS</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -349,18 +356,19 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  {/* Скопировать сумму в сумах */}
+                  {/* Скопировать сумму в сумах (ТОЛЬКО ЦИФРЫ) */}
                   <div>
                     <span className="block text-xs text-zinc-400 mb-2">
                       Точная сумма к переводу (в сумах):
                     </span>
                     <div className="flex items-center justify-between bg-zinc-900 border border-white/10 rounded-xl p-3">
                       <span className="font-mono text-sm font-bold text-cyan-300 tracking-wider">
-                        {productPrice}
+                        <span className="select-all">{numericPrice}</span>{" "}
+                        <span className="select-none">UZS</span>
                       </span>
                       <button
                         type="button"
-                        onClick={() => handleCopy(productPrice, "price")}
+                        onClick={() => handleCopy(numericPrice, "price")}
                         className="text-xs bg-cyan-950/80 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/30 hover:border-cyan-300 px-3 py-1.5 rounded-lg transition-all active:scale-95"
                       >
                         {copiedField === "price" ? "✓ Скопировано!" : "Скопировать сумму"}
@@ -419,7 +427,7 @@ function CheckoutContent() {
             <p className="text-zinc-400 max-w-md mx-auto text-xs leading-relaxed mb-8 tracking-wide">
               Спасибо, <span className="text-zinc-100 font-bold">{form.fullName || "друг"}</span>! Вы выбрали товар{" "}
               <strong className="text-pink-300">{productName}</strong> (размер: <span className="text-cyan-300 font-bold">{selectedSize}</span>) на сумму{" "}
-              <strong className="text-pink-300">{productPrice}</strong>. Мы свяжемся с вами и доставим по адресу: <br />
+              <strong className="text-pink-300">{productPriceRaw}</strong>. Мы свяжемся с вами и доставим по адресу: <br />
               <strong className="text-zinc-200 block mt-2">
                 г. Ташкент, {form.district} район, {form.street}, д. {form.house}
               </strong>
