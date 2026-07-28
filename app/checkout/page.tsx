@@ -140,7 +140,7 @@ function CheckoutContent() {
             href="/"
             className="inline-flex items-center gap-2 text-xs tracking-widest text-zinc-400 hover:text-cyan-300 transition-colors duration-300"
           >
-            ← [ НАЗАД В КАТАЛОГ ]
+            ←  НАЗАД В КАТАЛОГ 
           </Link>
           <h1 className="text-xl font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-fuchsia-300 to-cyan-300 uppercase drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">
              ОФОРМЛЕНИЕ 
@@ -195,7 +195,7 @@ function CheckoutContent() {
               {/* Контакты */}
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center gap-2 uppercase">
-                  <span>✧</span> Контактные данные
+                  <span></span> Контактные данные
                 </legend>
                 <Field
                   label="Имя и фамилия *"
@@ -227,7 +227,7 @@ function CheckoutContent() {
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center justify-between uppercase">
                   <span className="flex items-center gap-2">
-                    <span>✧</span> Доставка по Ташкенту
+                    <span></span> Доставка по Ташкенту
                   </span>
                   <span className="text-[10px] bg-pink-950/80 text-pink-300 px-2.5 py-1 rounded-full border border-pink-500/30">
                     Только Ташкент
@@ -300,7 +300,7 @@ function CheckoutContent() {
               {/* Оплата переводом */}
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center gap-2 uppercase">
-                  <span>✧</span> Оплата переводом на карту
+                  <span></span> Оплата переводом на карту
                 </legend>
 
                 <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-4 space-y-4">
@@ -377,7 +377,7 @@ function CheckoutContent() {
                 disabled={step === "processing"}
                 className="w-full text-center py-4 rounded-xl font-bold text-xs tracking-[0.2em] uppercase bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-pink-600 hover:to-purple-600 border border-white/20 hover:border-pink-300 text-zinc-200 hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-[0_0_20px_rgba(236,72,153,0.6)] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {step === "processing" ? "ОТПРАВКА..." : "Я ОПЛАТИЛ — ПОДТВЕРДИТЬ ✦"}
+                {step === "processing" ? "ОТПРАВКА..." : "Я ОПЛАТИЛ — ПОДТВЕРДИТЬ "}
               </button>
             </form>
           </div>
