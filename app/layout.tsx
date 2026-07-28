@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "y2kstore — Пополнение игр и сервисов",
-  description: "Быстрое и надежное пополнение игровых валют и сервисов",
+  title: "y2kstore — Одежда в стиле Y2K",
+  description: "Стильная одежда в эстетике Y2K: тренды нулевых в современном формате",
 };
 
 export default function RootLayout({
