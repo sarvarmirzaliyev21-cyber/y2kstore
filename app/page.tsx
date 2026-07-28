@@ -9,7 +9,7 @@ interface Product {
   name: string;
   priceUzs: string;
   sizesDisplay: string;
-  allSizes?: string[]; // Есть только у кроссовок для выпадающего списка
+  allSizes?: string[]; // Есть у товаров с большим выбором размеров (например, кроссовки)
   imageUrl: string;
 }
 
@@ -61,6 +61,62 @@ export default function Home() {
       sizesDisplay: "35 – 46",
       allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"],
       imageUrl: "/products/shmoti.jpg",
+    },
+    {
+      id: 7,
+      name: "Cyber Graphic Tee",
+      priceUzs: "140 000 UZS",
+      sizesDisplay: "S, M, L, XL",
+      imageUrl: "/products/futbolka.jpg",
+    },
+    {
+      id: 8,
+      name: "Y2K Star Print Tee",
+      priceUzs: "80 000 UZS",
+      sizesDisplay: "XS, S, M, L",
+      imageUrl: "/products/futbolochka.jpg",
+    },
+    {
+      id: 9,
+      name: "Cyber Crown Beanie / Cap",
+      priceUzs: "30 000 UZS",
+      sizesDisplay: "One Size",
+      imageUrl: "/products/korona.jpg",
+    },
+    {
+      id: 10,
+      name: "Retro Cyber MP3 Player",
+      priceUzs: "130 000 UZS",
+      sizesDisplay: "One Size",
+      imageUrl: "/products/mp3.jpg",
+    },
+    {
+      id: 11,
+      name: "Y2K Cyber Headphones",
+      priceUzs: "80 000 UZS",
+      sizesDisplay: "One Size",
+      imageUrl: "/products/naushi.jpg",
+    },
+    {
+      id: 12,
+      name: "Pahan Y2K Zip-Hoodie",
+      priceUzs: "200 000 UZS",
+      sizesDisplay: "M, L, XL, 2XL",
+      imageUrl: "/products/pahan.jpg",
+    },
+    {
+      id: 13,
+      name: "Cyberpunk Tactical Backpack",
+      priceUzs: "220 000 UZS",
+      sizesDisplay: "One Size",
+      imageUrl: "/products/rukzak.jpg",
+    },
+    {
+      id: 14,
+      name: "Y2K Pleated Cyber Skirt",
+      priceUzs: "120 000 UZS",
+      sizesDisplay: "XS, S, M",
+      imageUrl: "/products/yubka.jpg",
     },
   ];
 
@@ -185,7 +241,7 @@ export default function Home() {
                       <span>Размеры:</span>
                       <span className="text-zinc-200 font-semibold">{product.sizesDisplay}</span>
 
-                      {/* Показываем кнопку "все" ТОЛЬКО если есть allSizes (у кроссовок) */}
+                      {/* Кнопка "все" только при наличии allSizes */}
                       {hasDropdown && (
                         <button
                           type="button"
@@ -206,7 +262,7 @@ export default function Home() {
                       )}
                     </p>
 
-                    {/* Выпадающий список (выводится только у кроссовок при нажатии) */}
+                    {/* Выпадающий список */}
                     {hasDropdown && isOpen && product.allSizes && (
                       <div className="absolute left-0 top-full mt-2 w-full p-3 rounded-xl bg-zinc-900/95 border border-pink-500/40 shadow-[0_10px_25px_rgba(0,0,0,0.9)] backdrop-blur-md animate-in fade-in slide-in-from-top-1 duration-200 z-30">
                         <span className="text-[10px] text-pink-300 uppercase font-semibold block mb-2 tracking-widest border-b border-white/10 pb-1">
