@@ -6,7 +6,6 @@ import Link from "next/link";
 import Image from "next/image";
 
 const CARD_NUMBER = "5614 6814 2082 8182";
-const USD_TO_UZS_RATE = 12048.99;
 
 const TASHKENT_DISTRICTS = [
   "Алмазарский",
@@ -23,26 +22,23 @@ const TASHKENT_DISTRICTS = [
   "Яшнабадский",
 ];
 
-function parseAndConvertPrice(rawPrice: string | null): { sumInUzs: number; formattedUzs: string } {
-  if (!rawPrice) return { sumInUzs: 0, formattedUzs: "0 UZS" };
-  const cleanNumber = parseFloat(rawPrice.replace(/[^0-9.]/g, ""));
-  if (isNaN(cleanNumber)) return { sumInUzs: 0, formattedUzs: "0 UZS" };
-
-  const sumInUzs = Math.round(cleanNumber * USD_TO_UZS_RATE);
-  const formattedUzs = `${sumInUzs.toLocaleString("ru-RU")} UZS`;
-
-  return { sumInUzs, formattedUzs };
-}
-
 function CheckoutContent() {
   const params = useSearchParams();
 
   const productName = params.get("name") || "Товар из Y2K Store";
-  const rawPrice = params.get("price") || "$0.00";
+  const productPrice = params.get("price") || "0 UZS";
+  const productSizesRaw = params.get("sizes") || "XS, S, M, L";
   const productImg = params.get("img") || "/products/y2k-tee.jpg";
 
-  const { sumInUzs, formattedUzs } = parseAndConvertPrice(rawPrice);
+  // Разбиваем строку размеров на массив
+  const availableSizes = productSizesRaw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
+  const [selectedSize, setSelectedSize] = useState<string>(
+    availableSizes[0] || "M"
+  );
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<"form" | "processing" | "success">("form");
   const [copiedField, setCopiedField] = useState<"card" | "price" | null>(null);
@@ -60,8 +56,7 @@ function CheckoutContent() {
   });
 
   useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 30);
-    return () => clearTimeout(t);
+    setMounted(true);
   }, []);
 
   const handleChange = (field: string, value: string) => {
@@ -82,6 +77,7 @@ function CheckoutContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!receiptFile) {
       alert("Пожалуйста, прикрепите чек об оплате!");
       return;
@@ -100,7 +96,8 @@ function CheckoutContent() {
       formData.append("apartment", form.apartment);
       formData.append("landmark", form.landmark);
       formData.append("productName", productName);
-      formData.append("price", formattedUzs);
+      formData.append("size", selectedSize); // Отправляем выбранный размер
+      formData.append("price", productPrice);
       formData.append("receipt", receiptFile);
 
       const res = await fetch("/api/checkout", {
@@ -111,7 +108,7 @@ function CheckoutContent() {
       if (res.ok) {
         setStep("success");
       } else {
-        alert("Ошибка при отправке заказа в Telegram. Попробуйте еще раз.");
+        alert("Ошибка при отправке заказа. Попробуйте еще раз.");
         setStep("form");
       }
     } catch (err) {
@@ -140,16 +137,19 @@ function CheckoutContent() {
             href="/"
             className="inline-flex items-center gap-2 text-xs tracking-widest text-zinc-400 hover:text-cyan-300 transition-colors duration-300"
           >
-            ←  НАЗАД В КАТАЛОГ 
+            ← НАЗАД В КАТАЛОГ 
           </Link>
           <h1 className="text-xl font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-fuchsia-300 to-cyan-300 uppercase drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">
-             ОФОРМЛЕНИЕ 
+            ОФОРМЛЕНИЕ 
           </h1>
         </header>
 
         {step !== "success" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Карточка товара */}
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
+            {/* Карточка товара с выбором размера */}
             <div
               className={`md:col-span-1 backdrop-blur-xl bg-zinc-900/30 border border-white/10 rounded-2xl p-5 h-fit transition-all duration-700 ease-out delay-100 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
                 mounted ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
@@ -164,15 +164,44 @@ function CheckoutContent() {
                   className="object-cover"
                 />
               </div>
-              <h4 className="font-bold text-sm mb-2 tracking-wider text-zinc-100 uppercase">{productName}</h4>
+              <h4 className="font-bold text-sm mb-2 tracking-wider text-zinc-100 uppercase">
+                {productName}
+              </h4>
+
+              {/* Выбор размера */}
+              <div className="mb-4">
+                <span className="block text-[11px] text-zinc-400 mb-2 uppercase tracking-wider">
+                  Выберите размер:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {availableSizes.map((size) => {
+                    const isSelected = selectedSize === size;
+                    return (
+                      <button
+                        key={size}
+                        type="button" // 🔥 ВАЖНО: тип button, чтобы не отправлялась форма
+                        onClick={() => setSelectedSize(size)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 border ${
+                          isSelected
+                            ? "bg-pink-500 text-white border-pink-400 shadow-[0_0_12px_rgba(236,72,153,0.5)] scale-105"
+                            : "bg-zinc-900 text-zinc-400 border-white/10 hover:border-white/30 hover:text-zinc-200"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <p className="text-cyan-300 font-extrabold text-xl tracking-widest drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]">
-                {formattedUzs}
+                {productPrice}
               </p>
 
               <div className="mt-6 pt-6 border-t border-white/10 space-y-3 text-xs text-zinc-400">
                 <div className="flex justify-between">
-                  <span>Товар</span>
-                  <span className="text-zinc-200">{formattedUzs}</span>
+                  <span>Размер</span>
+                  <span className="text-pink-300 font-bold">{selectedSize}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Доставка по Ташкенту</span>
@@ -180,14 +209,13 @@ function CheckoutContent() {
                 </div>
                 <div className="flex justify-between text-zinc-100 font-bold text-sm pt-3 border-t border-white/10">
                   <span>Итого к оплате</span>
-                  <span className="text-pink-400 tracking-wider">{formattedUzs}</span>
+                  <span className="text-pink-400 tracking-wider">{productPrice}</span>
                 </div>
               </div>
             </div>
 
-            {/* Форма */}
-            <form
-              onSubmit={handleSubmit}
+            {/* Поля формы */}
+            <div
               className={`md:col-span-2 backdrop-blur-xl bg-zinc-900/30 border border-white/10 rounded-2xl p-6 md:p-8 space-y-8 transition-all duration-700 ease-out delay-200 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
                 mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
               }`}
@@ -195,7 +223,7 @@ function CheckoutContent() {
               {/* Контакты */}
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center gap-2 uppercase">
-                  <span></span> Контактные данные
+                  Контактные данные
                 </legend>
                 <Field
                   label="Имя и фамилия *"
@@ -226,9 +254,7 @@ function CheckoutContent() {
               {/* Адрес доставки по Ташкенту */}
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center justify-between uppercase">
-                  <span className="flex items-center gap-2">
-                    <span></span> Доставка по Ташкенту
-                  </span>
+                  <span>Доставка по Ташкенту</span>
                   <span className="text-[10px] bg-pink-950/80 text-pink-300 px-2.5 py-1 rounded-full border border-pink-500/30">
                     Только Ташкент
                   </span>
@@ -300,7 +326,7 @@ function CheckoutContent() {
               {/* Оплата переводом */}
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center gap-2 uppercase">
-                  <span></span> Оплата переводом на карту
+                  Оплата переводом на карту
                 </legend>
 
                 <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-4 space-y-4">
@@ -330,14 +356,14 @@ function CheckoutContent() {
                     </span>
                     <div className="flex items-center justify-between bg-zinc-900 border border-white/10 rounded-xl p-3">
                       <span className="font-mono text-sm font-bold text-cyan-300 tracking-wider">
-                        {formattedUzs}
+                        {productPrice}
                       </span>
                       <button
                         type="button"
-                        onClick={() => handleCopy(sumInUzs.toString(), "price")}
+                        onClick={() => handleCopy(productPrice, "price")}
                         className="text-xs bg-cyan-950/80 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/30 hover:border-cyan-300 px-3 py-1.5 rounded-lg transition-all active:scale-95"
                       >
-                        {copiedField === "price" ? "✓ Скопировано!" : "Скопировать сумы"}
+                        {copiedField === "price" ? "✓ Скопировано!" : "Скопировать сумму"}
                       </button>
                     </div>
                   </div>
@@ -362,7 +388,7 @@ function CheckoutContent() {
                       </div>
                       <input
                         type="file"
-                        accept="image/*,.pdf"
+                        accept="image/*,application/pdf"
                         onChange={handleFileChange}
                         className="hidden"
                         required
@@ -379,8 +405,8 @@ function CheckoutContent() {
               >
                 {step === "processing" ? "ОТПРАВКА..." : "Я ОПЛАТИЛ — ПОДТВЕРДИТЬ "}
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
         )}
 
         {/* Экран успеха */}
@@ -391,8 +417,9 @@ function CheckoutContent() {
               ЗАКАЗ И ЧЕК ПРИНЯТЫ!
             </h2>
             <p className="text-zinc-400 max-w-md mx-auto text-xs leading-relaxed mb-8 tracking-wide">
-              Спасибо, <span className="text-zinc-100 font-bold">{form.fullName || "друг"}</span>! Мы проверим перевод на сумму{" "}
-              <strong className="text-pink-300">{formattedUzs}</strong> и доставим ваш заказ по адресу: <br />
+              Спасибо, <span className="text-zinc-100 font-bold">{form.fullName || "друг"}</span>! Вы выбрали товар{" "}
+              <strong className="text-pink-300">{productName}</strong> (размер: <span className="text-cyan-300 font-bold">{selectedSize}</span>) на сумму{" "}
+              <strong className="text-pink-300">{productPrice}</strong>. Мы свяжемся с вами и доставим по адресу: <br />
               <strong className="text-zinc-200 block mt-2">
                 г. Ташкент, {form.district} район, {form.street}, д. {form.house}
               </strong>
@@ -445,7 +472,7 @@ function Field({
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center font-mono">Загрузка...</div>}>
       <CheckoutContent />
     </Suspense>
   );

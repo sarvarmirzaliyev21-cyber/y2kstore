@@ -19,19 +19,21 @@ export async function POST(req: Request) {
     const landmark = formData.get("landmark") as string;
     const productName = formData.get("productName") as string;
     const price = formData.get("price") as string;
+    const size = formData.get("size") as string; // 👈 Добавили считывание размера
     const receiptFile = formData.get("receipt") as File;
 
     const caption = `
 🛒 **НОВЫЙ ЗАКАЗ**
 
 📦 **Товар:** ${productName}
+📏 **Размер:** ${size || "Не указан"}
 💰 **Сумма:** ${price}
 
 👤 **Покупатель:** ${fullName}
 📞 **Телефон:** ${phone}
 ✉️ **Email:** ${email}
 
-📍 **Адрес:**г. Ташкент, ${district} р-н, ${street}, д. ${house}${apartment ? `, кв. ${apartment}` : ""}
+📍 **Адрес:** г. Ташкент, ${district} р-н, ${street}, д. ${house}${apartment ? `, кв. ${apartment}` : ""}
 🧭 **Ориентир:** ${landmark || "Не указан"}
     `;
 
