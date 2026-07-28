@@ -105,7 +105,7 @@ export default function Home() {
              NEW COLLECTION 2026 
             </span>
             <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400 uppercase">
-              CYBER AGE CLOTHING
+              Y2K STREETWEAR
             </h2>
             <p className="text-zinc-400 max-w-lg mx-auto text-xs md:text-sm leading-relaxed tracking-wider font-sans">
               Минималистичный сайбер-панк & уличный стиль. Быстрая доставка по Ташкенту.
