@@ -64,7 +64,7 @@ export default function Home() {
 
           <div className="flex items-center gap-3 sm:gap-4">
             <span className="hidden sm:inline-block text-xs tracking-widest bg-pink-950/60 text-pink-300 px-3.5 py-1.5 rounded-full border border-pink-500/30 shadow-[0_0_10px_rgba(236,72,153,0.2)]">
-              ✦ ТАШКЕНТ
+              ТАШКЕНТ
             </span>
 
             {/* Иконка Телеграма */}
@@ -117,7 +117,7 @@ export default function Home() {
         <section id="catalog" className="pt-4 scroll-mt-28">
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
             <h3 className="text-xs font-bold tracking-[0.3em] text-pink-300 uppercase flex items-center gap-2">
-              <span className="animate-pulse">✧</span> КАТАЛОГ ТОВАРОВ
+              <span className="animate-pulse"></span> КАТАЛОГ ТОВАРОВ
             </h3>
             <span className="text-xs text-cyan-400/80 font-mono">[ 3 POSITIONS ]</span>
           </div>
