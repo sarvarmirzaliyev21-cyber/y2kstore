@@ -178,7 +178,7 @@ export default function Home() {
                 onClick={scrollToCatalog}
                 className="inline-flex items-center px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 text-cyan-300 hover:text-white hover:bg-cyan-500/20 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] active:scale-95 transition-all duration-500 ease-out cursor-pointer"
               >
-                КАТАЛОГ 
+                КАТАЛОГ
               </a>
             </nav>
           </div>
@@ -190,14 +190,21 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
             <span className="inline-block px-4 py-1.5 bg-pink-500/15 border border-pink-400/30 rounded-full text-[11px] font-semibold text-pink-300 mb-6 tracking-[0.3em] uppercase shadow-[0_0_12px_rgba(236,72,153,0.3)] transition-all duration-500 hover:scale-105">
-              NEW COLLECTION 2026 
+              NEW COLLECTION 2026
             </span>
             <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400 uppercase">
               Y2K STREETWEAR
             </h2>
-            <p className="text-zinc-400 max-w-lg mx-auto text-xs md:text-sm leading-relaxed tracking-wider font-sans">
-              Минималистичный сайбер-панк & уличный стиль. Быстрая доставка по Ташкенту.
+            
+            <p className="text-zinc-400 max-w-lg mx-auto text-xs md:text-sm leading-relaxed tracking-wider font-sans mb-4">
+              Минималистичный сайбер-панк &amp; уличный стиль.
             </p>
+
+            {/* Блок со сроком доставки */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-xs font-mono shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span>ДОСТАВКА: 8 – 16 ДНЕЙ</span>
+            </div>
           </div>
         </section>
 
@@ -205,7 +212,7 @@ export default function Home() {
         <section id="catalog" className="pt-4 scroll-mt-28">
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
             <h3 className="text-xs font-bold tracking-[0.3em] text-pink-300 uppercase flex items-center gap-2">
-              <span className="animate-pulse"></span> КАТАЛОГ ТОВАРОВ
+              <span className="animate-pulse">★</span> КАТАЛОГ ТОВАРОВ
             </h3>
             <span className="text-xs text-cyan-400/80 font-mono">[ {products.length} POSITIONS ]</span>
           </div>
@@ -297,7 +304,7 @@ export default function Home() {
                     )}&img=${encodeURIComponent(product.imageUrl)}`}
                     className="mt-auto w-full text-center py-3.5 rounded-xl font-bold text-xs tracking-[0.2em] uppercase bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-pink-600 hover:to-purple-600 border border-white/20 hover:border-pink-300 text-zinc-200 hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-[0_0_20px_rgba(236,72,153,0.6)] active:scale-95"
                   >
-                    КУПИТЬ 
+                    КУПИТЬ
                   </Link>
                 </div>
               );

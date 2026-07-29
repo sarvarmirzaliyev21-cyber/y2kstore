@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -30,10 +30,7 @@ function CheckoutContent() {
   const productSizesRaw = params.get("sizes") || "XS, S, M, L";
   const productImg = params.get("img") || "/products/y2k-tee.jpg";
 
-  // Очищаем цену от UZS для копирования только чистой суммы (цифр)
   const numericPrice = productPriceRaw.replace(" UZS", "");
-
-  // Разбиваем строку размеров на массив
   const availableSizes = productSizesRaw
     .split(",")
     .map((s) => s.trim())
@@ -46,6 +43,7 @@ function CheckoutContent() {
   const [step, setStep] = useState<"form" | "processing" | "success">("form");
   const [copiedField, setCopiedField] = useState<"card" | "price" | null>(null);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -90,14 +88,7 @@ function CheckoutContent() {
 
     try {
       const formData = new FormData();
-      formData.append("fullName", form.fullName);
-      formData.append("phone", form.phone);
-      formData.append("email", form.email);
-      formData.append("district", form.district);
-      formData.append("street", form.street);
-      formData.append("house", form.house);
-      formData.append("apartment", form.apartment);
-      formData.append("landmark", form.landmark);
+      Object.entries(form).forEach(([key, val]) => formData.append(key, val));
       formData.append("productName", productName);
       formData.append("size", selectedSize);
       formData.append("price", productPriceRaw);
@@ -123,7 +114,6 @@ function CheckoutContent() {
 
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-mono relative overflow-hidden selection:bg-pink-500 selection:text-white">
-      {/* 🌌 Y2K Фоновые сферы */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-tr from-pink-600/20 to-purple-600/20 rounded-full blur-[150px] animate-pulse duration-[10000ms] ease-in-out" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-gradient-to-bl from-cyan-500/20 to-indigo-600/20 rounded-full blur-[150px] animate-pulse duration-[8000ms] delay-1000 ease-in-out" />
@@ -134,7 +124,6 @@ function CheckoutContent() {
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         }`}
       >
-        {/* Шапка */}
         <header className="mb-10 flex items-center justify-between backdrop-blur-2xl bg-zinc-900/40 border border-white/15 px-6 py-4 rounded-3xl shadow-[0_0_25px_rgba(236,72,153,0.15)]">
           <Link
             href="/"
@@ -152,7 +141,7 @@ function CheckoutContent() {
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
-            {/* Карточка товара с выбором размера */}
+            {/* Секция товара */}
             <div
               className={`md:col-span-1 backdrop-blur-xl bg-zinc-900/30 border border-white/10 rounded-2xl p-5 h-fit transition-all duration-700 ease-out delay-100 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
                 mounted ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
@@ -171,7 +160,6 @@ function CheckoutContent() {
                 {productName}
               </h4>
 
-              {/* Выбор размера */}
               <div className="mb-4">
                 <span className="block text-[11px] text-zinc-400 mb-2 uppercase tracking-wider">
                   Выберите размер:
@@ -197,7 +185,6 @@ function CheckoutContent() {
                 </div>
               </div>
 
-              {/* Цена с защитой слова UZS от выделения */}
               <p className="text-cyan-300 font-extrabold text-xl tracking-widest drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]">
                 <span className="select-all">{numericPrice}</span>{" "}
                 <span className="select-none">UZS</span>
@@ -221,13 +208,12 @@ function CheckoutContent() {
               </div>
             </div>
 
-            {/* Поля формы */}
+            {/* Форма */}
             <div
               className={`md:col-span-2 backdrop-blur-xl bg-zinc-900/30 border border-white/10 rounded-2xl p-6 md:p-8 space-y-8 transition-all duration-700 ease-out delay-200 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
                 mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
               }`}
             >
-              {/* Контакты */}
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center gap-2 uppercase">
                   Контактные данные
@@ -258,7 +244,6 @@ function CheckoutContent() {
                 </div>
               </fieldset>
 
-              {/* Адрес доставки по Ташкенту */}
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center justify-between uppercase">
                   <span>Доставка по Ташкенту</span>
@@ -330,14 +315,12 @@ function CheckoutContent() {
                 />
               </fieldset>
 
-              {/* Оплата переводом */}
               <fieldset className="space-y-4">
                 <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center gap-2 uppercase">
                   Оплата переводом на карту
                 </legend>
 
                 <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-4 space-y-4">
-                  {/* Скопировать номер карты */}
                   <div>
                     <span className="block text-xs text-zinc-400 mb-2">
                       Карта Uzcard / Humo:
@@ -356,7 +339,6 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  {/* Скопировать сумму в сумах (ТОЛЬКО ЦИФРЫ) */}
                   <div>
                     <span className="block text-xs text-zinc-400 mb-2">
                       Точная сумма к переводу (в сумах):
@@ -376,7 +358,6 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  {/* Загрузка чека */}
                   <div className="pt-2">
                     <span className="block text-xs text-zinc-400 mb-2">
                       Прикрепите скриншот чека (Payme / Click / Uzum) *
@@ -395,6 +376,7 @@ function CheckoutContent() {
                         </p>
                       </div>
                       <input
+                        ref={fileInputRef}
                         type="file"
                         accept="image/*,application/pdf"
                         onChange={handleFileChange}
@@ -417,7 +399,6 @@ function CheckoutContent() {
           </form>
         )}
 
-        {/* Экран успеха */}
         {step === "success" && (
           <div className="animate-[fadeIn_0.6s_ease-out] backdrop-blur-xl bg-zinc-900/40 border border-white/20 rounded-3xl p-10 md:p-16 text-center shadow-[0_0_40px_rgba(236,72,153,0.25)]">
             <div className="text-5xl mb-6 text-pink-400">✧</div>
