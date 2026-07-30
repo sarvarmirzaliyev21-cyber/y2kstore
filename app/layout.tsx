@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import { Unbounded, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import OnlineTracker from "@/components/OnlineTracker";
 
-// Y2K Заголовки (широкий, футуристичный шрифт)
+import { MarqueeBanner } from "@/components/MarqueeBanner";
+import CartDrawer from "@/components/CartDrawer";
+// Исправленный путь: CartContext лежит в app/context/
+import { CartProvider } from "@/app/context/CartContext";
+
 const unbounded = Unbounded({
   variable: "--font-unbounded",
   subsets: ["latin", "cyrillic"],
 });
 
-// Y2K Текст и детали (технологичный моноширинный)
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin", "cyrillic"],
@@ -30,9 +32,12 @@ export default function RootLayout({
       lang="ru"
       className={`${unbounded.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-mono bg-zinc-950 text-zinc-100 selection:bg-pink-500 selection:text-white">
-        <OnlineTracker />
-        {children}
+      <body className="h-full bg-[#050508] text-zinc-100 font-mono overflow-x-hidden selection:bg-pink-500 selection:text-white">
+        <CartProvider>
+          <MarqueeBanner />
+          {children}
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );

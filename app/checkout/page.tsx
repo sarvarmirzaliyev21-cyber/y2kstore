@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CARD_NUMBER = "5614 6814 2082 8182";
 
@@ -20,67 +21,234 @@ const TASHKENT_DISTRICTS = [
   "Юнусабадский",
   "Яккасарайский",
   "Яшнабадский",
+  "Таш. область (Пригород)",
 ];
+
+// Улучшенная плавная кривая для эффекта "дорогой" анимации
+const cinematicEase = [0.16, 1, 0.3, 1];
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.3, ease: cinematicEase },
+  },
+};
+
+const fadeUpBlur = {
+  hidden: { opacity: 0, y: 40, filter: "blur(12px)", scale: 0.98 },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    filter: "blur(0px)", 
+    scale: 1,
+    transition: { duration: 1.4, ease: cinematicEase } 
+  },
+};
+
+// --- КОМПОНЕНТ ШУМА (КИНОПЛЕНКА) ---
+function FilmNoise() {
+  return (
+    <div 
+      className="fixed inset-0 pointer-events-none z-[100] opacity-[0.04] mix-blend-overlay"
+      style={{ 
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` 
+      }} 
+    />
+  );
+}
+
+// --- УЛУЧШЕННЫЙ ЗВЕЗДНЫЙ ПОЛЕТ (ГЛОУ И 120FPS) ---
+function StarField() {
+  const stars = useRef(
+    Array.from({ length: 60 }).map(() => ({
+      x: Math.random() * 100 - 50,
+      y: Math.random() * 100 - 50,
+      size: Math.random() * 2.5 + 0.5,
+      duration: Math.random() * 2 + 1.2,
+      delay: Math.random() * 2,
+      glow: Math.random() > 0.5 ? "rgba(255, 255, 255, 0.8)" : "rgba(167, 139, 250, 0.6)", // Белый или легкий фиолетовый оттенок
+    }))
+  ).current;
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-black">
+      {/* Глубокий кинематографичный свет на фоне */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-indigo-900/10 blur-[120px] rounded-full" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30vw] h-[30vw] bg-cyan-900/10 blur-[80px] rounded-full" />
+      
+      {stars.map((star, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: star.size,
+            height: star.size,
+            left: `50%`,
+            top: `50%`,
+            backgroundColor: "#fff",
+            boxShadow: `0 0 ${star.size * 4}px ${star.size}px ${star.glow}`,
+          }}
+          initial={{ x: star.x * 5, y: star.y * 5, scale: 0, opacity: 0 }}
+          animate={{
+            x: star.x * 140,
+            y: star.y * 140,
+            scale: [0, 1.5, 3],
+            opacity: [0, 1, 0],
+          }}
+          transition={{
+            duration: star.duration,
+            repeat: Infinity,
+            ease: "easeIn",
+            delay: star.delay,
+          }}
+        />
+      ))}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000000_100%)]" />
+    </div>
+  );
+}
+
+// --- КИНЕМАТОГРАФИЧНЫЙ ВЫПАДАЮЩИЙ СПИСОК ---
+function CinematicSelect({ label, options, value, onChange }: any) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-full group" ref={dropdownRef}>
+      {label && <label className="block text-[10px] text-zinc-500 mb-2 font-bold tracking-[0.15em] uppercase group-focus-within:text-indigo-400 transition-colors duration-500">{label}</label>}
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className={`w-full bg-zinc-950/40 backdrop-blur-2xl border px-4 py-4 text-sm text-left transition-all duration-500 flex items-center justify-between relative overflow-hidden ${
+          isOpen 
+            ? "border-indigo-500/50 text-white shadow-[0_0_30px_-5px_rgba(99,102,241,0.2)]" 
+            : "border-white/10 text-zinc-300 hover:border-white/30 hover:bg-white/[0.02]"
+        }`}
+      >
+        <span className="truncate relative z-10">{value} район</span>
+        <span className={`text-zinc-500 text-xs transition-transform duration-500 relative z-10 ${isOpen ? "rotate-180" : "rotate-0"}`}>▼</span>
+        
+        {/* Анимированная подсветка снизу */}
+        <div className={`absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 transition-all duration-500 ${isOpen ? "w-full opacity-100" : "w-0 opacity-0"}`} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 15, filter: "blur(10px)", scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+            exit={{ opacity: 0, y: 10, filter: "blur(5px)", scale: 0.98 }}
+            transition={{ duration: 0.4, ease: cinematicEase }}
+            className="absolute left-0 right-0 top-[110%] z-50 bg-black/80 backdrop-blur-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden rounded-xl"
+          >
+            <div className="max-h-60 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+              {options.map((option: string) => {
+                const isSelected = option === value;
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => { onChange(option); setIsOpen(false); }}
+                    className={`w-full text-left px-4 py-3 text-sm transition-all duration-300 flex items-center justify-between rounded-lg ${
+                      isSelected 
+                        ? "bg-gradient-to-r from-indigo-500/20 to-transparent text-white font-medium border-l-2 border-indigo-500" 
+                        : "text-zinc-400 hover:bg-white/5 hover:text-white border-l-2 border-transparent hover:border-white/20"
+                    }`}
+                  >
+                    <span>{option} район</span>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// --- ПОЛЕ ВВОДА С НЕОНОВЫМ ФОКУСОМ ---
+function CinematicField({ label, value, onChange, placeholder, type = "text", required = false, disabled = false }: any) {
+  return (
+    <label className="block group relative">
+      <span className="block text-[10px] text-zinc-500 mb-2 font-bold tracking-[0.15em] uppercase group-focus-within:text-cyan-400 transition-colors duration-500">
+        {label}
+      </span>
+      <div className="relative overflow-hidden rounded-none">
+        <input
+          type={type}
+          required={required}
+          value={value}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`w-full bg-zinc-950/40 backdrop-blur-2xl border border-white/10 px-4 py-4 text-sm text-white placeholder:text-zinc-700 outline-none transition-all duration-500 focus:bg-white/[0.03] ${
+            disabled ? "opacity-50 cursor-not-allowed" : "focus:border-white/30"
+          }`}
+        />
+        {/* Светящаяся полоса при фокусе */}
+        {!disabled && (
+          <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 group-focus-within:w-full transition-all duration-700 ease-out" />
+        )}
+      </div>
+    </label>
+  );
+}
 
 function CheckoutContent() {
   const params = useSearchParams();
-
   const productName = params.get("name") || "Товар из Y2K Store";
   const productPriceRaw = params.get("price") || "0 UZS";
   const productSizesRaw = params.get("sizes") || "XS, S, M, L";
   const productImg = params.get("img") || "/products/y2k-tee.jpg";
-
   const numericPrice = productPriceRaw.replace(" UZS", "");
-  const availableSizes = productSizesRaw
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const availableSizes = productSizesRaw.split(",").map((s) => s.trim()).filter(Boolean);
 
-  const [selectedSize, setSelectedSize] = useState<string>(
-    availableSizes[0] || "M"
-  );
-  const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState<"form" | "processing" | "success">("form");
+  const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0] || "M");
+  const [step, setStep] = useState<"promo" | "form" | "processing" | "success">("promo");
   const [copiedField, setCopiedField] = useState<"card" | "price" | null>(null);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
-    fullName: "",
-    phone: "+998 ",
-    email: "",
-    district: TASHKENT_DISTRICTS[0],
-    street: "",
-    house: "",
-    apartment: "",
-    landmark: "",
+    fullName: "", phone: "+998 ", email: "", district: TASHKENT_DISTRICTS[0], street: "", house: "", apartment: "", landmark: "",
   });
 
+  // Автоматический пропуск промо-заставки через 3 секунды
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (step === "promo") {
+      const timer = setTimeout(() => setStep("form"), 3200);
+      return () => clearTimeout(timer);
+    }
+  }, [step]);
 
-  const handleChange = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
+  const handleChange = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleCopy = (text: string, type: "card" | "price") => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(type);
-    setTimeout(() => setCopiedField(null), 2000);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedField(type);
+      setTimeout(() => setCopiedField(null), 2000);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setReceiptFile(e.target.files[0]);
-    }
+    if (e.target.files && e.target.files[0]) setReceiptFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!receiptFile) {
-      alert("Пожалуйста, прикрепите чек об оплате!");
+      alert("⚠️ Пожалуйста, прикрепите скриншот чека об оплате.");
       return;
     }
 
@@ -94,374 +262,316 @@ function CheckoutContent() {
       formData.append("price", productPriceRaw);
       formData.append("receipt", receiptFile);
 
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch("/api/checkout", { method: "POST", body: formData });
 
       if (res.ok) {
         setStep("success");
       } else {
-        alert("Ошибка при отправке заказа. Попробуйте еще раз.");
+        alert("Ошибка отправки заказа. Повторите попытку.");
         setStep("form");
       }
     } catch (err) {
       console.error(err);
-      alert("Произошла ошибка сети.");
+      alert("Сетевая ошибка. Проверьте подключение.");
       setStep("form");
     }
   };
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-mono relative overflow-hidden selection:bg-pink-500 selection:text-white">
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-tr from-pink-600/20 to-purple-600/20 rounded-full blur-[150px] animate-pulse duration-[10000ms] ease-in-out" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-gradient-to-bl from-cyan-500/20 to-indigo-600/20 rounded-full blur-[150px] animate-pulse duration-[8000ms] delay-1000 ease-in-out" />
-      </div>
+    <main className="min-h-screen bg-[#050505] text-zinc-200 font-sans relative overflow-x-hidden selection:bg-cyan-500 selection:text-black">
+      
+      {/* 🚀 VFX: Фоновый свет, Звезды и Кинопленка */}
+      <StarField />
+      <FilmNoise />
 
-      <div
-        className={`relative z-10 max-w-4xl mx-auto transition-all duration-700 ease-out ${
-          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-        }`}
-      >
-        <header className="mb-10 flex items-center justify-between backdrop-blur-2xl bg-zinc-900/40 border border-white/15 px-6 py-4 rounded-3xl shadow-[0_0_25px_rgba(236,72,153,0.15)]">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-xs tracking-widest text-zinc-400 hover:text-cyan-300 transition-colors duration-300"
+      <AnimatePresence mode="wait">
+        {/* 🎬 МИНИ-ТРЕЙЛЕР ИНТРО (Cinematic Director's Cut) */}
+        {step === "promo" && (
+          <motion.div
+            key="promo"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.1, filter: "blur(20px)" }}
+            transition={{ duration: 1.5, ease: cinematicEase }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black"
           >
-            ← НАЗАД В КАТАЛОГ 
-          </Link>
-          <h1 className="text-xl font-extrabold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-fuchsia-300 to-cyan-300 uppercase drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">
-            ОФОРМЛЕНИЕ 
-          </h1>
-        </header>
-
-        {step !== "success" && (
-          <form
-            onSubmit={handleSubmit}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            {/* Секция товара */}
-            <div
-              className={`md:col-span-1 backdrop-blur-xl bg-zinc-900/30 border border-white/10 rounded-2xl p-5 h-fit transition-all duration-700 ease-out delay-100 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
-                mounted ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-              }`}
+            <motion.div
+              initial={{ scale: 1.1, filter: "blur(10px)" }}
+              animate={{ scale: 1, filter: "blur(0px)" }}
+              transition={{ duration: 3, ease: "easeOut" }}
+              className="flex flex-col items-center"
             >
-              <div className="relative w-full h-60 mb-4 rounded-xl overflow-hidden border border-white/10 bg-zinc-950">
-                <Image
-                  src={productImg}
-                  alt={productName}
-                  fill
-                  sizes="300px"
-                  className="object-cover"
-                />
-              </div>
-              <h4 className="font-bold text-sm mb-2 tracking-wider text-zinc-100 uppercase">
-                {productName}
-              </h4>
-
-              <div className="mb-4">
-                <span className="block text-[11px] text-zinc-400 mb-2 uppercase tracking-wider">
-                  Выберите размер:
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {availableSizes.map((size) => {
-                    const isSelected = selectedSize === size;
-                    return (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => setSelectedSize(size)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 border ${
-                          isSelected
-                            ? "bg-pink-500 text-white border-pink-400 shadow-[0_0_12px_rgba(236,72,153,0.5)] scale-105"
-                            : "bg-zinc-900 text-zinc-400 border-white/10 hover:border-white/30 hover:text-zinc-200"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <p className="text-cyan-300 font-extrabold text-xl tracking-widest drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]">
-                <span className="select-all">{numericPrice}</span>{" "}
-                <span className="select-none">UZS</span>
-              </p>
-
-              <div className="mt-6 pt-6 border-t border-white/10 space-y-3 text-xs text-zinc-400">
-                <div className="flex justify-between">
-                  <span>Размер</span>
-                  <span className="text-pink-300 font-bold">{selectedSize}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Доставка по Ташкенту</span>
-                  <span className="text-cyan-300 font-bold">БЕСПЛАТНО</span>
-                </div>
-                <div className="flex justify-between text-zinc-100 font-bold text-sm pt-3 border-t border-white/10">
-                  <span>Итого к оплате</span>
-                  <span className="text-pink-400 tracking-wider">
-                    {numericPrice} <span className="select-none">UZS</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Форма */}
-            <div
-              className={`md:col-span-2 backdrop-blur-xl bg-zinc-900/30 border border-white/10 rounded-2xl p-6 md:p-8 space-y-8 transition-all duration-700 ease-out delay-200 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
-                mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
-              }`}
-            >
-              <fieldset className="space-y-4">
-                <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center gap-2 uppercase">
-                  Контактные данные
-                </legend>
-                <Field
-                  label="Имя и фамилия *"
-                  value={form.fullName}
-                  onChange={(v) => handleChange("fullName", v)}
-                  placeholder="Иван Иванов"
-                  required
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field
-                    label="Телефон *"
-                    value={form.phone}
-                    onChange={(v) => handleChange("phone", v)}
-                    placeholder="+998 90 123 45 67"
-                    required
-                  />
-                  <Field
-                    label="Email *"
-                    type="email"
-                    value={form.email}
-                    onChange={(v) => handleChange("email", v)}
-                    placeholder="you@example.com"
-                    required
-                  />
-                </div>
-              </fieldset>
-
-              <fieldset className="space-y-4">
-                <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center justify-between uppercase">
-                  <span>Доставка по Ташкенту</span>
-                  <span className="text-[10px] bg-pink-950/80 text-pink-300 px-2.5 py-1 rounded-full border border-pink-500/30">
-                    Только Ташкент
-                  </span>
-                </legend>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-zinc-400 mb-2 tracking-wide">
-                      Город
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      value="г. Ташкент"
-                      className="w-full bg-zinc-950/80 border border-white/10 rounded-xl px-4 py-3 text-xs text-pink-300 font-bold cursor-not-allowed opacity-90"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs text-zinc-400 mb-2 tracking-wide">
-                      Район *
-                    </label>
-                    <select
-                      value={form.district}
-                      onChange={(e) => handleChange("district", e.target.value)}
-                      className="w-full bg-zinc-950 border border-white/10 focus:border-pink-500/60 rounded-xl px-4 py-3 text-xs text-zinc-200 outline-none transition-all duration-300 cursor-pointer"
-                    >
-                      {TASHKENT_DISTRICTS.map((d) => (
-                        <option key={d} value={d} className="bg-zinc-950 text-zinc-200">
-                          {d} район
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <Field
-                  label="Улица / Массив / Квартал *"
-                  value={form.street}
-                  onChange={(v) => handleChange("street", v)}
-                  placeholder="напр. ул. Амира Темура или Чиланзар-3"
-                  required
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <Field
-                    label="Дом *"
-                    value={form.house}
-                    onChange={(v) => handleChange("house", v)}
-                    placeholder="12A"
-                    required
-                  />
-                  <Field
-                    label="Квартира / Офис"
-                    value={form.apartment}
-                    onChange={(v) => handleChange("apartment", v)}
-                    placeholder="45"
-                  />
-                </div>
-
-                <Field
-                  label="Ориентир (для курьера)"
-                  value={form.landmark}
-                  onChange={(v) => handleChange("landmark", v)}
-                  placeholder="напр. возле станции метро..."
-                />
-              </fieldset>
-
-              <fieldset className="space-y-4">
-                <legend className="text-pink-300 font-bold tracking-[0.2em] text-xs mb-2 flex items-center gap-2 uppercase">
-                  Оплата переводом на карту
-                </legend>
-
-                <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-4 space-y-4">
-                  <div>
-                    <span className="block text-xs text-zinc-400 mb-2">
-                      Карта Uzcard / Humo:
-                    </span>
-                    <div className="flex items-center justify-between bg-zinc-900 border border-white/10 rounded-xl p-3">
-                      <span className="font-mono text-sm font-bold text-pink-300 tracking-wider">
-                        {CARD_NUMBER}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(CARD_NUMBER.replace(/\s/g, ""), "card")}
-                        className="text-xs bg-pink-950/80 hover:bg-pink-600 text-pink-300 hover:text-white border border-pink-500/30 hover:border-pink-300 px-3 py-1.5 rounded-lg transition-all active:scale-95"
-                      >
-                        {copiedField === "card" ? "✓ Скопировано!" : "Скопировать"}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span className="block text-xs text-zinc-400 mb-2">
-                      Точная сумма к переводу (в сумах):
-                    </span>
-                    <div className="flex items-center justify-between bg-zinc-900 border border-white/10 rounded-xl p-3">
-                      <span className="font-mono text-sm font-bold text-cyan-300 tracking-wider">
-                        <span className="select-all">{numericPrice}</span>{" "}
-                        <span className="select-none">UZS</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(numericPrice, "price")}
-                        className="text-xs bg-cyan-950/80 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/30 hover:border-cyan-300 px-3 py-1.5 rounded-lg transition-all active:scale-95"
-                      >
-                        {copiedField === "price" ? "✓ Скопировано!" : "Скопировать сумму"}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="pt-2">
-                    <span className="block text-xs text-zinc-400 mb-2">
-                      Прикрепите скриншот чека (Payme / Click / Uzum) *
-                    </span>
-                    <label className="flex flex-col items-center justify-center w-full h-28 border border-dashed border-white/20 hover:border-pink-500/50 rounded-xl cursor-pointer bg-zinc-900/50 hover:bg-zinc-900 transition-colors">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <span className="text-2xl mb-1">🧾</span>
-                        <p className="text-xs text-zinc-400 text-center px-2">
-                          {receiptFile ? (
-                            <span className="text-pink-300 font-bold">
-                              Выбран файл: {receiptFile.name}
-                            </span>
-                          ) : (
-                            "Нажмите, чтобы загрузить чек"
-                          )}
-                        </p>
-                      </div>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*,application/pdf"
-                        onChange={handleFileChange}
-                        className="hidden"
-                        required
-                      />
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-
-              <button
-                type="submit"
-                disabled={step === "processing"}
-                className="w-full text-center py-4 rounded-xl font-bold text-xs tracking-[0.2em] uppercase bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-pink-600 hover:to-purple-600 border border-white/20 hover:border-pink-300 text-zinc-200 hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-[0_0_20px_rgba(236,72,153,0.6)] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+              <motion.p 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ delay: 0.3, duration: 1.5, ease: cinematicEase }}
+                className="text-zinc-600 tracking-[0.6em] text-[10px] uppercase mb-4 font-mono font-bold"
               >
-                {step === "processing" ? "ОТПРАВКА..." : "Я ОПЛАТИЛ — ПОДТВЕРДИТЬ "}
-              </button>
-            </div>
-          </form>
+                A Y2K Store Production
+              </motion.p>
+              
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  textShadow: [
+                    "0px 0px 0px rgba(255,0,0,0), 0px 0px 0px rgba(0,255,255,0)",
+                    "4px 0px 15px rgba(255,0,0,0.8), -4px 0px 15px rgba(0,255,255,0.8)",
+                    "0px 0px 30px rgba(255,255,255,0.4), 0px 0px 30px rgba(255,255,255,0.4)"
+                  ]
+                }} 
+                transition={{ delay: 0.8, duration: 2, ease: cinematicEase }}
+                className="text-4xl sm:text-6xl text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500 font-light tracking-[0.3em] uppercase text-center leading-tight"
+              >
+                Оформление<br/>Заказа
+              </motion.h1>
+            </motion.div>
+          </motion.div>
         )}
 
-        {step === "success" && (
-          <div className="animate-[fadeIn_0.6s_ease-out] backdrop-blur-xl bg-zinc-900/40 border border-white/20 rounded-3xl p-10 md:p-16 text-center shadow-[0_0_40px_rgba(236,72,153,0.25)]">
-            <div className="text-5xl mb-6 text-pink-400">✧</div>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-pink-200 to-cyan-300 uppercase">
-              ЗАКАЗ И ЧЕК ПРИНЯТЫ!
-            </h2>
-            <p className="text-zinc-400 max-w-md mx-auto text-xs leading-relaxed mb-8 tracking-wide">
-              Спасибо, <span className="text-zinc-100 font-bold">{form.fullName || "друг"}</span>! Вы выбрали товар{" "}
-              <strong className="text-pink-300">{productName}</strong> (размер: <span className="text-cyan-300 font-bold">{selectedSize}</span>) на сумму{" "}
-              <strong className="text-pink-300">{productPriceRaw}</strong>. Мы свяжемся с вами и доставим по адресу: <br />
-              <strong className="text-zinc-200 block mt-2">
-                г. Ташкент, {form.district} район, {form.street}, д. {form.house}
-              </strong>
-              {form.landmark && <span className="text-cyan-300/80"> (ориентир: {form.landmark})</span>}.
-            </p>
-            <Link
-              href="/"
-              className="inline-block py-3.5 px-8 rounded-xl font-bold text-xs tracking-[0.2em] uppercase bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-pink-600 hover:to-purple-600 border border-white/20 hover:border-pink-300 text-zinc-200 hover:text-white transition-all duration-500 active:scale-95"
+        {/* 📝 ОСНОВНАЯ ФОРМА СО ВСЕМИ ПОЛЯМИ */}
+        {(step === "form" || step === "processing") && (
+          <motion.div
+            key="checkout"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, filter: "blur(15px)" }}
+            transition={{ duration: 1.5 }}
+            className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-16 min-h-screen flex flex-col"
+          >
+            <motion.header 
+              initial={{ opacity: 0, y: -30, filter: "blur(10px)" }} 
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
+              transition={{ duration: 1.5, ease: cinematicEase, delay: 0.2 }}
+              className="mb-12 flex items-center justify-between border-b border-white/5 pb-8"
             >
-              ВЕРНУТЬСЯ В КАТАЛОГ 
-            </Link>
-          </div>
-        )}
-      </div>
-    </main>
-  );
-}
+              <Link href="/" className="group flex items-center gap-4 text-xs text-zinc-500 hover:text-white transition-colors duration-700">
+                <div className="w-8 h-[1px] bg-zinc-700 group-hover:bg-white group-hover:w-16 transition-all duration-700 ease-out" />
+                <span className="uppercase tracking-[0.2em] font-bold font-mono">Вернуться</span>
+              </Link>
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#22d3ee]" />
+                <span className="text-[10px] font-bold font-mono tracking-[0.2em] text-zinc-500 uppercase">Secure Connection</span>
+              </div>
+            </motion.header>
 
-function Field({
-  label,
-  value,
-  onChange,
-  placeholder,
-  type = "text",
-  required = false,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  type?: string;
-  required?: boolean;
-}) {
-  return (
-    <label className="block">
-      <span className="block text-xs text-zinc-400 mb-2 tracking-wide">
-        {label}
-      </span>
-      <input
-        type={type}
-        required={required}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full bg-zinc-950 border border-white/10 focus:border-pink-500/60 rounded-xl px-4 py-3 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none transition-all duration-300"
-      />
-    </label>
+            <motion.form variants={staggerContainer} initial="hidden" animate="show" onSubmit={handleSubmit} className="flex flex-col xl:flex-row gap-12 xl:gap-20 flex-grow">
+              
+              {/* ЛЕВАЯ КОЛОНКА: ТОВАР */}
+              <motion.div variants={fadeUpBlur} className="w-full xl:w-5/12">
+                <div className="xl:sticky xl:top-12 bg-black/40 backdrop-blur-3xl p-8 sm:p-10 border border-white/5 shadow-[0_30px_60px_rgba(0,0,0,0.8)] relative overflow-hidden group">
+                  {/* Фоновый свет карточки */}
+                  <div className="absolute -top-32 -right-32 w-64 h-64 bg-white/5 blur-[100px] rounded-full pointer-events-none transition-all duration-1000 group-hover:bg-white/10" />
+                  
+                  <h2 className="text-[10px] font-bold tracking-[0.2em] mb-8 text-zinc-500 uppercase">Детали заказа</h2>
+                  
+                  <div className="relative w-full aspect-[3/4] mb-8 overflow-hidden bg-black/50 border border-white/5 group-hover:border-white/10 transition-colors duration-500">
+                    <Image src={productImg} alt={productName} fill sizes="(max-width: 1280px) 100vw, 50vw" className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000 ease-out" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+                  </div>
+
+                  <h3 className="text-xl font-light mb-8 text-white tracking-wide">{productName}</h3>
+
+                  <div className="mb-10">
+                    <span className="block text-[10px] text-zinc-500 mb-4 font-bold uppercase tracking-[0.2em]">Выбранный размер</span>
+                    <div className="grid grid-cols-4 gap-3">
+                      {availableSizes.map((size) => (
+                        <button
+                          key={size} type="button" onClick={() => setSelectedSize(size)}
+                          className={`py-3.5 text-xs font-mono transition-all duration-500 relative overflow-hidden ${
+                            selectedSize === size 
+                              ? "text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)]" 
+                              : "bg-transparent text-zinc-400 border border-white/10 hover:border-white/30 hover:text-white"
+                          }`}
+                        >
+                          {selectedSize === size && (
+                            <motion.div layoutId="activeSize" className="absolute inset-0 bg-white" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />
+                          )}
+                          <span className="relative z-10">{size}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-8 border-t border-white/5 space-y-4 text-sm text-zinc-400">
+                    <div className="flex justify-between items-center">
+                      <span className="tracking-wide">Доставка (Ташкент)</span>
+                      <span className="text-emerald-400 font-mono text-xs tracking-wider">БЕСПЛАТНО</span>
+                    </div>
+                    <div className="flex justify-between items-end pt-6 border-t border-white/5">
+                      <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em]">Итого к оплате</span>
+                      <span className="text-3xl font-light tracking-tight text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                        {numericPrice} <span className="text-sm text-zinc-500 font-mono ml-1">UZS</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* ПРАВАЯ КОЛОНКА: АНКЕТА */}
+              <div className="w-full xl:w-7/12 space-y-16 pb-20">
+                
+                {/* 1. КОНТАКТЫ */}
+                <motion.fieldset variants={fadeUpBlur} className="space-y-6">
+                  <legend className="text-xs text-white font-light tracking-[0.3em] uppercase border-b border-white/10 pb-6 w-full flex items-center gap-4">
+                    <span className="text-zinc-600 font-mono">01</span> Контакты
+                  </legend>
+                  <CinematicField label="Имя и фамилия *" value={form.fullName} onChange={(v: string) => handleChange("fullName", v)} placeholder="Иван Иванов" required />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <CinematicField label="Телефон *" type="tel" value={form.phone} onChange={(v: string) => handleChange("phone", v)} placeholder="+998 90 123 45 67" required />
+                    <CinematicField label="Email *" type="email" value={form.email} onChange={(v: string) => handleChange("email", v)} placeholder="mail@example.com" required />
+                  </div>
+                </motion.fieldset>
+
+                {/* 2. АДРЕС */}
+                <motion.fieldset variants={fadeUpBlur} className="space-y-6">
+                  <legend className="text-xs text-white font-light tracking-[0.3em] uppercase border-b border-white/10 pb-6 w-full flex justify-between items-center">
+                    <div className="flex items-center gap-4"><span className="text-zinc-600 font-mono">02</span> Локация</div>
+                  </legend>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <CinematicField label="Город" value="г. Ташкент" onChange={()=>{}} disabled={true} />
+                    <CinematicSelect label="Район *" options={TASHKENT_DISTRICTS} value={form.district} onChange={(val: string) => handleChange("district", val)} />
+                  </div>
+
+                  <CinematicField label="Улица / Массив / Квартал *" value={form.street} onChange={(v: string) => handleChange("street", v)} placeholder="напр. ул. Амира Темура" required />
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <CinematicField label="Дом *" value={form.house} onChange={(v: string) => handleChange("house", v)} placeholder="12А" required />
+                    <CinematicField label="Кв / Офис" value={form.apartment} onChange={(v: string) => handleChange("apartment", v)} placeholder="404" />
+                  </div>
+
+                  <CinematicField label="Ориентир (необязательно)" value={form.landmark} onChange={(v: string) => handleChange("landmark", v)} placeholder="Что рядом?" />
+                </motion.fieldset>
+
+                {/* 3. ОПЛАТА */}
+                <motion.fieldset variants={fadeUpBlur} className="space-y-6">
+                  <legend className="text-xs text-white font-light tracking-[0.3em] uppercase border-b border-white/10 pb-6 w-full flex items-center gap-4">
+                    <span className="text-zinc-600 font-mono">03</span> Транзакция
+                  </legend>
+                  
+                  <div className="p-8 border border-white/10 bg-black/50 backdrop-blur-3xl space-y-8 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none" />
+                    
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-6 pb-8 border-b border-white/5 relative z-10">
+                      <div>
+                        <p className="text-[10px] font-bold text-zinc-500 tracking-[0.2em] mb-2 uppercase">Uzcard / Humo</p>
+                        <p className="text-xl sm:text-2xl font-mono text-white tracking-[0.15em]">{CARD_NUMBER}</p>
+                      </div>
+                      <button type="button" onClick={() => handleCopy(CARD_NUMBER.replace(/\s/g, ""), "card")} className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 hover:text-white border border-white/10 hover:border-white/50 bg-white/5 px-6 py-3 transition-all duration-500">
+                        {copiedField === "card" ? "✓ СКОПИРОВАНО" : "КОПИРОВАТЬ"}
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-6 relative z-10">
+                      <div>
+                        <p className="text-[10px] font-bold text-zinc-500 tracking-[0.2em] mb-2 uppercase">Сумма перевода</p>
+                        <p className="text-xl sm:text-2xl font-mono text-cyan-400 tracking-[0.1em] drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">{numericPrice} UZS</p>
+                      </div>
+                      <button type="button" onClick={() => handleCopy(numericPrice, "price")} className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 hover:text-white border border-white/10 hover:border-white/50 bg-white/5 px-6 py-3 transition-all duration-500">
+                        {copiedField === "price" ? "✓ СКОПИРОВАНО" : "КОПИРОВАТЬ"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* DROPZONE */}
+                  <div className="pt-4">
+                    <label className={`group relative flex flex-col items-center justify-center w-full min-h-[160px] border border-dashed cursor-pointer transition-all duration-700 overflow-hidden ${
+                      receiptFile 
+                        ? "border-emerald-500 bg-emerald-950/10 text-emerald-300 shadow-[0_0_30px_-5px_rgba(16,185,129,0.2)]" 
+                        : "border-white/20 bg-black/40 hover:bg-white/[0.02] hover:border-white/50 text-zinc-500"
+                    }`}>
+                      {/* Эффект сканирования при наведении */}
+                      {!receiptFile && <div className="absolute top-0 left-0 w-full h-[1px] bg-cyan-400/50 shadow-[0_0_10px_#22d3ee] -translate-y-full group-hover:animate-[scan_2s_ease-in-out_infinite]" />}
+                      
+                      <div className="flex flex-col items-center justify-center p-8 text-center relative z-10">
+                        <span className={`text-3xl mb-4 transition-transform duration-500 ${receiptFile ? "scale-110" : "group-hover:-translate-y-2"}`}>
+                          {receiptFile ? "✓" : "+"}
+                        </span>
+                        <p className="text-xs font-bold tracking-[0.15em] uppercase">
+                          {receiptFile ? receiptFile.name : "Загрузить чек об оплате"}
+                        </p>
+                        {!receiptFile && <p className="text-[10px] tracking-widest mt-2 opacity-50">JPEG, PNG, PDF</p>}
+                      </div>
+                      <input ref={fileInputRef} type="file" accept="image/*,application/pdf" onChange={handleFileChange} className="hidden" />
+                    </label>
+                  </div>
+                </motion.fieldset>
+
+                {/* КНОПКА САБМИТА (Cinematic Shimmer) */}
+                <motion.button
+                  variants={fadeUpBlur} type="submit" disabled={step === "processing"}
+                  className="relative group w-full py-6 mt-10 bg-white text-black text-xs font-bold uppercase tracking-[0.4em] overflow-hidden transition-all duration-500 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-wait shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.3)]"
+                >
+                  {/* Блик пробегающий по кнопке */}
+                  <div className="absolute inset-0 -translate-x-[150%] bg-gradient-to-r from-transparent via-white/80 to-transparent group-hover:animate-[shimmer_1.5s_infinite_ease-in-out] mix-blend-difference" />
+                  
+                  <span className="relative z-10">
+                    {step === "processing" ? "СИНХРОНИЗАЦИЯ..." : "ПОДТВЕРДИТЬ ЗАКАЗ"}
+                  </span>
+                </motion.button>
+              </div>
+            </motion.form>
+          </motion.div>
+        )}
+
+        {/* 🎉 УСПЕХ (Epic Ending) */}
+        {step === "success" && (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, filter: "blur(30px)", scale: 1.1 }} 
+            animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} 
+            transition={{ duration: 2, ease: cinematicEase }}
+            className="relative z-20 min-h-screen flex flex-col items-center justify-center text-center px-4 bg-black"
+          >
+            {/* Громадное фоновое свечение успеха */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-emerald-900/10 blur-[150px] rounded-full pointer-events-none" />
+
+            <div className="space-y-8 mb-16 relative z-10">
+              <div className="w-16 h-16 mx-auto border border-emerald-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                <span className="text-emerald-400 text-2xl">✓</span>
+              </div>
+              <h2 className="text-4xl sm:text-6xl font-light text-white tracking-[0.3em] uppercase">Заказ Принят</h2>
+              <p className="text-zinc-500 text-sm tracking-[0.2em] font-mono uppercase">Транзакция успешно завершена</p>
+            </div>
+            
+            <div className="max-w-lg w-full bg-white/[0.02] border border-white/5 p-8 mb-16 space-y-4 text-xs text-zinc-400 font-mono text-left relative z-10 backdrop-blur-md">
+              <p className="text-emerald-400 border-b border-emerald-900/30 pb-4 mb-4 font-bold">ДАННЫЕ ПЕРЕДАНЫ В ОБРАБОТКУ</p>
+              <p className="text-white flex justify-between"><span className="text-zinc-600">КЛИЕНТ:</span> {form.fullName}</p>
+              <p className="text-white flex justify-between"><span className="text-zinc-600">ТОВАР:</span> {productName} ({selectedSize})</p>
+              <p className="text-white flex justify-between"><span className="text-zinc-600">ЛОКАЦИЯ:</span> {form.district} р-н</p>
+            </div>
+
+            <Link href="/" className="relative z-10 border border-white/20 px-10 py-5 text-[10px] font-bold tracking-[0.3em] uppercase text-zinc-300 hover:text-black hover:bg-white transition-all duration-700">
+              ВЕРНУТЬСЯ В КАТАЛОГ
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Tailwind Animations Injection (чтобы не трогать tailwind.config.js) */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes shimmer {
+          100% { transform: translateX(150%); }
+        }
+        @keyframes scan {
+          0% { transform: translateY(-100%); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateY(160px); opacity: 0; }
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+      `}} />
+    </main>
   );
 }
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center font-mono">Загрузка...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
       <CheckoutContent />
     </Suspense>
   );
