@@ -147,7 +147,7 @@ function CinematicSelect({ label, options, value, onChange }: any) {
             initial={{ opacity: 0, y: 15, filter: "blur(10px)", scale: 0.98 }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
             exit={{ opacity: 0, y: 10, filter: "blur(5px)", scale: 0.98 }}
-            transition={{ duration: 0.4, ease: cinematicEase }}
+            transition={{ duration: 0.4, ease: cinematicEase as any }}
             className="absolute left-0 right-0 top-[110%] z-50 bg-black/80 backdrop-blur-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden rounded-xl"
           >
             <div className="max-h-60 overflow-y-auto p-2 space-y-1 custom-scrollbar">
