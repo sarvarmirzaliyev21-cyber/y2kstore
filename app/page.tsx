@@ -22,7 +22,7 @@ interface CategoryGroup {
 }
 
 // --- КИНЕМАТОГРАФИЧЕСКИЕ НАСТРОЙКИ ---
-const cinematicEase = [0.22, 1, 0.36, 1]; 
+const cinematicEase = [0.22, 1, 0.36, 1] as const; 
 
 const textRevealContainer = {
   hidden: { opacity: 0 },

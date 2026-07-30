@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useCart } from "../app/context/CartContext";
 
-const cinematicEase = [0.22, 1, 0.36, 1];
+const cinematicEase = [0.22, 1, 0.36, 1] as const;
 
 // Вспомогательная функция для форматирования цены одного товара
 const formatPrice = (price: number) =>
