@@ -303,6 +303,12 @@ export default function Home() {
         { id: 28, name: "Футболка", priceUzs: 200000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/14.jpg" },
         { id: 29, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/16.jpg" },
         { id: 30, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/17.jpg" },
+        { id: 53, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/a.png" },
+        { id: 54, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/40.png" },
+        { id: 55, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/41.png" },
+        { id: 56, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/42.png" },
+        { id: 57, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/43.png" },
+        { id: 58, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/44.png" },
       ],
     },
     {
