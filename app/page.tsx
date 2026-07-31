@@ -283,152 +283,187 @@ export default function Home() {
   const finalOpacity = useTransform(finalP, [0, 0.3, 0.8], [0, 1, 1]);
 
   const categories: CategoryGroup[] = [
-    {
-      slug: "tshirts-hoodies",
-      categoryName: "Футболки и Худи",
-      products: [
-        { id: 1, name: "Лонгслив", priceUzs: 200000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/y2k-tee.jpg", tag: "ХИТ ДРОПА" },
-        { id: 2, name: "Лонгслив Skeleton", priceUzs: 220000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/skelet.jpg" },
-        { id: 3, name: "Футболка", priceUzs: 140000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/futbolka.jpg" },
-        { id: 4, name: "Футболка", priceUzs: 80000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/futbolochka.jpg" },
-        { id: 5, name: "Лонгслив", priceUzs: 200000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/hoodie.jpg" },
-        { id: 6, name: "Футболка", priceUzs: 200000, sizesDisplay: "M, L, XL, 2XL", imageUrl: "/products/pahan.jpg", tag: "ЛИМИТКА" },
-        { id: 22, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/8.jpg" },
-        { id: 23, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/9.jpg" },
-        { id: 24, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/10.jpg" },
-        { id: 25, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/11.jpg" },
-        { id: 26, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/12.jpg" },
-        { id: 27, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/13.png" },
-        { id: 28, name: "Футболка", priceUzs: 200000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/14.jpg" },
-        { id: 29, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/16.jpg" },
-        { id: 30, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/17.jpg" },
-        { id: 53, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/a.png" },
-        { id: 54, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/40.png" },
-        { id: 55, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/41.png" },
-        { id: 56, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/42.png" },
-        { id: 57, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/43.png" },
-        { id: 58, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/44.png" },
-      ],
-    },
-    {
-      slug: "pants",
-      categoryName: "Джинсы",
-      products: [
-        { id: 7, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S - 2XL", imageUrl: "/products/jins.jpg", tag: "БЕСТСЕЛЛЕР" },
-        { id: 8, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/jinsik.jpg" },
-        { id: 9, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/1.jpg" },
-        { id: 10, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/2.jpg" },
-        { id: 11, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/3.jpg" },
-        { id: 12, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/4.jpg" },
-        { id: 13, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/5.jpg" },
-        { id: 14, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/6.jpg" },
-        { id: 15, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/7.jpg" },
-        { id: 31, name: "Джинсы", priceUzs: 200000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/18.jpg" },
-      ],
-    },
-    {
-      slug: "shorts",
-      categoryName: "Шорты",
-      products: [
-        { id: 32, name: "Шорты", priceUzs: 130000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/19.jpg" },
-      ],
-    },
-    {
-      slug: "sets",
-      categoryName: "Сеты",
-      products: [
-        { id: 33, name: "Сет", priceUzs: 130000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/15.jpg" },
-      ],
-    },
-    {
-      slug: "footwear",
-      categoryName: "Обувь",
-      products: [
-        { id: 16, name: "Кроссовки", priceUzs: 500000, sizesDisplay: "35 – 46", allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"], imageUrl: "/products/shmot.jpg", tag: "NEW TECH" },
-        { id: 17, name: "Кроссовки", priceUzs: 500000, sizesDisplay: "35 – 46", allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"], imageUrl: "/products/shmoti.jpg" },
-      ],
-    },
-    {
-      slug: "backpacks-bags",
-      categoryName: "Рюкзаки и Сумки",
-      products: [
-        { id: 18, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/rukzak.jpg" },
-        { id: 34, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/20.png" },
-        { id: 35, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/21.png" },
-        { id: 36, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/22.png" },
-        { id: 37, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/23.png" },
-        { id: 38, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/24.png" },
-        { id: 39, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/25.png" },
-        { id: 40, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/26.png" },
-        { id: 41, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/27.png" },
-        { id: 42, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/28.png" },
-        { id: 43, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/29.png" },
-        { id: 44, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/30.png" },
-      ],
-    },
-    {
-      slug: "accessories",
-      categoryName: "Аксессуары",
-      products: [
-        { id: 19, name: "Корона", priceUzs: 30000, sizesDisplay: "Единый размер", imageUrl: "/products/korona.jpg" },
-        { id: 20, name: "MP3 Плеер", priceUzs: 130000, sizesDisplay: "Единый размер", imageUrl: "/products/mp3.jpg" },
-        { id: 21, name: "Наушники", priceUzs: 80000, sizesDisplay: "Единый размер", imageUrl: "/products/naushi.jpg" },
-        { id: 45, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/31.png" },
-        { id: 46, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/32.png" },
-        { id: 47, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/33.png" },
-        { id: 48, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/34.png" },
-        { id: 49, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/35.png" },
-        { id: 50, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/36.png" },
-        { id: 51, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/37.jpg" },
-        { id: 52, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/38.jpg" },
-      ],
-    },
-  ];
+  {
+    slug: "tshirts-hoodies",
+    categoryName: "Футболки и Худи",
+    products: [
+      { id: 1, name: "Лонгслив", priceUzs: 200000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/y2k-tee.jpg", tag: "ХИТ ДРОПА" },
+      { id: 2, name: "Лонгслив Skeleton", priceUzs: 220000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/skelet.jpg" },
+      { id: 3, name: "Футболка", priceUzs: 140000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/futbolka.jpg" },
+      { id: 4, name: "Футболка", priceUzs: 80000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/futbolochka.jpg" },
+      { id: 5, name: "Лонгслив", priceUzs: 200000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/hoodie.jpg" },
+      { id: 6, name: "Футболка", priceUzs: 200000, sizesDisplay: "M, L, XL, 2XL", imageUrl: "/products/pahan.jpg", tag: "ЛИМИТКА" },
+      { id: 22, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/8.jpg" },
+      { id: 23, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/9.jpg" },
+      { id: 24, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/10.jpg" },
+      { id: 25, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/11.jpg" },
+      { id: 26, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/12.jpg" },
+      { id: 27, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/13.png" },
+      { id: 28, name: "Футболка", priceUzs: 200000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/14.jpg" },
+      { id: 29, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/16.jpg" },
+      { id: 30, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/17.jpg" },
+      { id: 51, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/51.png" },
+      { id: 52, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/52.png" },
+      { id: 53, name: "Футболка", priceUzs: 160000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/53.png" },
+      { id: 54, name: "Футболка", priceUzs: 280000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/54.png" },
+      { id: 55, name: "Футболка", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/55.png" },
+      { id: 56, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/56.png" },
+      { id: 57, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/57.png" },
+      { id: 58, name: "Футболка", priceUzs: 150000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/58.png" },
+      { id: 59, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/59.png" },
+      { id: 60, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/60.png" },
+      { id: 61, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/61.png" },
+      { id: 62, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/62.png" },
+      { id: 63, name: "Футболка", priceUzs: 300000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/63.png" },
+      { id: 64, name: "Футболка", priceUzs: 200000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/64.png" },
+      { id: 65, name: "Футболка", priceUzs: 180000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/65.png" },
+      { id: 66, name: "Футболка", priceUzs: 140000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/66.png" },
+      { id: 67, name: "Футболка", priceUzs: 300000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/67.png" },
+      { id: 68, name: "Футболка", priceUzs: 170000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/68.png" },
+      { id: 69, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/69.png" },
+      { id: 70, name: "Футболка", priceUzs: 220000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/70.png" },
+      { id: 71, name: "Футболка", priceUzs: 300000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/71.png" },
+      { id: 72, name: "Футболка", priceUzs: 140000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/72.png" },
+      { id: 73, name: "Футболка", priceUzs: 230000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/73.png" },
+      { id: 74, name: "Футболка", priceUzs: 80000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/74.png" },
+      { id: 75, name: "Футболка", priceUzs: 300000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/75.png" },
+      { id: 76, name: "Футболка", priceUzs: 130000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/76.png" },
+      { id: 77, name: "Футболка", priceUzs: 140000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/77.png" },
+      { id: 78, name: "Футболка", priceUzs: 130000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/78.png" },
+    ],
+  },
+  {
+    slug: "pants",
+    categoryName: "Джинсы",
+    products: [
+      { id: 7, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S - 2XL", imageUrl: "/products/jins.jpg", tag: "БЕСТСЕЛЛЕР" },
+      { id: 8, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/jinsik.jpg" },
+      { id: 9, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/1.jpg" },
+      { id: 10, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/2.jpg" },
+      { id: 11, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/3.jpg" },
+      { id: 12, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/4.jpg" },
+      { id: 13, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/5.jpg" },
+      { id: 14, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/6.jpg" },
+      { id: 15, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/7.jpg" },
+      { id: 31, name: "Джинсы", priceUzs: 200000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/18.jpg" },
+    ],
+  },
+  {
+    slug: "hats",
+    categoryName: "Шапки",
+    products: [
+      { id: 79, name: "Шапка", priceUzs: 140000, sizesDisplay: "Единый размер", imageUrl: "/products/79.png" },
+    ],
+  },
+  {
+    slug: "shorts",
+    categoryName: "Шорты",
+    products: [
+      { id: 32, name: "Шорты", priceUzs: 130000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/19.jpg" },
+    ],
+  },
+  {
+    slug: "sets",
+    categoryName: "Сеты",
+    products: [
+      { id: 33, name: "Сет", priceUzs: 130000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/15.jpg" },
+    ],
+  },
+  {
+    slug: "footwear",
+    categoryName: "Обувь",
+    products: [
+      { id: 16, name: "Кроссовки", priceUzs: 500000, sizesDisplay: "35 – 46", allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"], imageUrl: "/products/shmot.jpg", tag: "NEW TECH" },
+      { id: 17, name: "Кроссовки", priceUzs: 500000, sizesDisplay: "35 – 46", allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"], imageUrl: "/products/shmoti.jpg" },
+    ],
+  },
+  {
+    slug: "backpacks-bags",
+    categoryName: "Рюкзаки и Сумки",
+    products: [
+      { id: 18, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/rukzak.jpg" },
+      { id: 34, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/20.png" },
+      { id: 35, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/21.png" },
+      { id: 36, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/22.png" },
+      { id: 37, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/23.png" },
+      { id: 38, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/24.png" },
+      { id: 39, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/25.png" },
+      { id: 40, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/26.png" },
+      { id: 41, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/27.png" },
+      { id: 42, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/28.png" },
+      { id: 43, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/29.png" },
+      { id: 44, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/30.png" },
+      { id: 59, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/45.png" },
+      { id: 60, name: "Рюкзак", priceUzs: 450000, sizesDisplay: "Единый размер", imageUrl: "/products/46.png" },
+      { id: 61, name: "Рюкзак", priceUzs: 450000, sizesDisplay: "Единый размер", imageUrl: "/products/47.png" },
+      { id: 62, name: "Рюкзак", priceUzs: 300000, sizesDisplay: "Единый размер", imageUrl: "/products/48.png" },
+      { id: 63, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/49.png" },
+      { id: 64, name: "Рюкзак", priceUzs: 350000, sizesDisplay: "Единый размер", imageUrl: "/products/50.png" },
+    ],
+  },
+  {
+    slug: "accessories",
+    categoryName: "Аксессуары",
+    products: [
+      { id: 19, name: "Корона", priceUzs: 30000, sizesDisplay: "Единый размер", imageUrl: "/products/korona.jpg" },
+      { id: 20, name: "MP3 Плеер", priceUzs: 130000, sizesDisplay: "Единый размер", imageUrl: "/products/mp3.jpg" },
+      { id: 21, name: "Наушники", priceUzs: 80000, sizesDisplay: "Единый размер", imageUrl: "/products/naushi.jpg" },
+      { id: 45, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/31.png" },
+      { id: 46, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/32.png" },
+      { id: 47, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/33.png" },
+      { id: 48, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/34.png" },
+      { id: 49, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/35.png" },
+      { id: 50, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/36.png" },
+      { id: 51, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/37.jpg" },
+      { id: 52, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/38.jpg" },
+    ],
+  },
+];
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 450);
-    const handleClickOutside = (e: globalThis.MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpenDropdownId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const scrollToCatalog = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
-    const target = document.getElementById("catalog");
-    if (!target) return;
-    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - 90;
-    const startPosition = window.pageYOffset;
-    const distance = targetPosition - startPosition;
-    const duration = 1200;
-    let start: number | null = null;
-
-    const step = (timestamp: number) => {
-      if (!start) start = timestamp;
-      const progress = timestamp - start;
-      const t = Math.min(progress / duration, 1);
-      const ease = t === 1 ? 1 : t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      window.scrollTo(0, startPosition + distance * ease);
-      if (progress < duration) window.requestAnimationFrame(step);
-    };
-    window.requestAnimationFrame(step);
-  };
-
-  const handleSizeClick = (product: Product) => {
-    if (window.innerWidth < 640) {
-      setSelectedProductForSheet(product);
-    } else {
-      setOpenDropdownId(openDropdownId === product.id ? null : product.id);
+useEffect(() => {
+  const timer = setTimeout(() => setIsLoaded(true), 450);
+  const handleClickOutside = (e: globalThis.MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      setOpenDropdownId(null);
     }
   };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    clearTimeout(timer);
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
-  const totalProducts = categories.reduce((acc, cat) => acc + cat.products.length, 0);
+const scrollToCatalog = (e?: React.MouseEvent) => {
+  if (e) e.preventDefault();
+  const target = document.getElementById("catalog");
+  if (!target) return;
+  const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - 90;
+  const startPosition = window.pageYOffset;
+  const distance = targetPosition - startPosition;
+  const duration = 1200;
+  let start: number | null = null;
+
+  const step = (timestamp: number) => {
+    if (!start) start = timestamp;
+    const progress = timestamp - start;
+    const t = Math.min(progress / duration, 1);
+    const ease = t === 1 ? 1 : t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    window.scrollTo(0, startPosition + distance * ease);
+    if (progress < duration) window.requestAnimationFrame(step);
+  };
+  window.requestAnimationFrame(step);
+};
+
+const handleSizeClick = (product: Product) => {
+  if (window.innerWidth < 640) {
+    setSelectedProductForSheet(product);
+  } else {
+    setOpenDropdownId(openDropdownId === product.id ? null : product.id);
+  }
+};
+
+const totalProducts = categories.reduce((acc, cat) => acc + cat.products.length, 0);
 
   return (
     <ReactLenis
