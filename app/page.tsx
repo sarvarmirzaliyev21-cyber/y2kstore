@@ -434,10 +434,9 @@ export default function Home() {
     <ReactLenis
       root
       options={{
-        lerp: 0.04, // Чем меньше значение, тем дольше и плавнее скользит
-        smoothWheel: true, // Включаем для колесика мыши
-        smoothTouch: true, // Включаем инерцию для телефонов!
-        touchMultiplier: 1.5, // Усиливаем свайп на мобилках, чтобы было легче листать
+        lerp: 0.04,
+        smoothWheel: true,
+        touchMultiplier: 1.5,
         wheelMultiplier: 0.9,
       }}
     >
