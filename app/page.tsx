@@ -10,14 +10,13 @@ import {
   useTransform,
   useMotionValue,
   useSpring,
-  useMotionTemplate,
 } from "framer-motion";
 
 // --- ТИПЫ ---
 interface Product {
   id: number;
   name: string;
-  priceUzs: string;
+  priceUzs: number; // ТУТ ИЗМЕНЕНО НА number
   sizesDisplay: string;
   allSizes?: string[];
   imageUrl: string;
@@ -33,7 +32,6 @@ interface CategoryGroup {
 // --- CINEMATIC PHYSICS ---
 const cinematicEase = [0.16, 1, 0.3, 1] as const;
 const springSoft = { type: "spring" as const, stiffness: 90, damping: 22, mass: 0.8 };
-const springSnappy = { type: "spring" as const, stiffness: 180, damping: 24 };
 
 const textRevealContainer = {
   hidden: { opacity: 0 },
@@ -85,7 +83,7 @@ const MarqueeTicker = ({ text }: { text: string }) => (
     >
       {Array.from({ length: 10 }).map((_, i) => (
         <span key={i} className="flex items-center gap-7">
-          <span className="text-cyan-400/40">✦</span>
+          <span className="text-zinc-600">✦</span>
           <span className="hover:text-white transition-colors duration-700">{text}</span>
         </span>
       ))}
@@ -117,8 +115,6 @@ const ProductCard = ({
 
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
-  const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
-  const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
 
   const [spotlight, setSpotlight] = useState({ x: 50, y: 50 });
 
@@ -154,7 +150,7 @@ const ProductCard = ({
       className="group relative flex flex-col transform-gpu perspective-1000 h-full will-change-transform"
     >
       {/* Card shell */}
-      <div className="relative w-full aspect-[3/4] mb-6 overflow-hidden bg-[#050505] border border-white/[0.07] group-hover:border-white/25 transition-colors duration-700 rounded-[2px] shadow-[0_20px_60px_rgba(0,0,0,0.6)] group-hover:shadow-[0_30px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(34,211,238,0.08)]">
+      <div className="relative w-full aspect-[3/4] mb-6 overflow-hidden bg-[#050505] border border-white/[0.07] group-hover:border-white/25 transition-colors duration-700 rounded-[2px] shadow-[0_20px_60px_rgba(0,0,0,0.6)] group-hover:shadow-[0_30px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(255,255,255,0.05)]">
         {/* Dynamic spotlight */}
         <div
           className="pointer-events-none absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-600"
@@ -177,16 +173,13 @@ const ProductCard = ({
           alt={product.name}
           fill
           sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover opacity-70 grayscale-[25%] group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-[1.06] transition-all duration-[1600ms] ease-[0.16,1,0.3,1] transform-gpu will-change-transform"
+          className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-[1.06] transition-all duration-[1600ms] ease-[0.16,1,0.3,1] transform-gpu will-change-transform"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-85 group-hover:opacity-25 transition-opacity duration-1000" />
-
-        {/* Y2K scan grid */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-[0.12] pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:18px_18px] transition-opacity duration-800" />
       </div>
 
-      {/* Info layer (slight Z lift) */}
+      {/* Info layer */}
       <div className="flex flex-col flex-1 px-1 transform-gpu" style={{ transform: "translateZ(24px)" }}>
         <h5 className="font-bold text-[11px] sm:text-xs text-white mb-2.5 tracking-[0.22em] uppercase line-clamp-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
           {product.name}
@@ -195,7 +188,7 @@ const ProductCard = ({
         <div className="relative mb-6 z-20" ref={isOpen ? dropdownRef : null}>
           <p className="text-[10px] text-zinc-500 tracking-widest font-mono flex items-center justify-between">
             <span>
-              SIZE: <span className="text-zinc-300">{product.sizesDisplay}</span>
+              РАЗМЕР: <span className="text-zinc-300">{product.sizesDisplay}</span>
             </span>
             {hasDropdown && (
               <motion.button
@@ -219,13 +212,13 @@ const ProductCard = ({
                 className="hidden sm:block absolute left-0 top-full mt-3 w-full p-4 bg-[#0a0a0a]/95 border border-white/12 backdrop-blur-3xl z-30 shadow-[0_40px_80px_rgba(0,0,0,0.95)] rounded-sm"
               >
                 <span className="text-[9px] text-zinc-500 uppercase block mb-3 tracking-[0.35em] border-b border-white/10 pb-2">
-                  SELECT FIT
+                  ВЫБЕРИТЕ РАЗМЕР
                 </span>
                 <div className="grid grid-cols-3 gap-2">
                   {product.allSizes.map((size) => (
                     <span
                       key={size}
-                      className="py-1.5 text-center border border-white/10 bg-black/60 text-zinc-300 text-[10px] hover:border-cyan-400/60 hover:text-white hover:bg-cyan-400/10 transition-all duration-300 cursor-pointer rounded-sm font-mono"
+                      className="py-1.5 text-center border border-white/10 bg-black/60 text-zinc-300 text-[10px] hover:border-white hover:text-black hover:bg-white transition-all duration-300 cursor-pointer rounded-sm font-mono"
                     >
                       {size}
                     </span>
@@ -237,14 +230,16 @@ const ProductCard = ({
         </div>
 
         <div className="mt-auto flex items-end justify-between border-t border-white/10 pt-4">
-          <p className="text-cyan-400 font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.12em]">
-            {product.priceUzs}
+          {/* ТУТ ИЗМЕНЕН ВЫВОД ЦЕНЫ */}
+          <p className="text-white font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.12em]">
+            {product.priceUzs.toLocaleString('ru-RU')}
+            <span className="select-none text-zinc-400 ml-1">сум</span>
           </p>
           <Link
-            href={`/checkout?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${encodeURIComponent(product.priceUzs)}&img=${encodeURIComponent(product.imageUrl)}`}
-            className="group/btn relative overflow-hidden bg-white text-black px-4 py-1.5 text-[9px] sm:text-[10px] tracking-[0.32em] font-black uppercase hover:bg-cyan-400 transition-colors duration-500 flex items-center gap-1 rounded-sm shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(34,211,238,0.45)]"
+            href={`/checkout?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${encodeURIComponent(product.priceUzs.toString())}&img=${encodeURIComponent(product.imageUrl)}`}
+            className="group/btn relative overflow-hidden bg-white text-black px-4 py-1.5 text-[9px] sm:text-[10px] tracking-[0.32em] font-black uppercase hover:bg-zinc-200 transition-colors duration-500 flex items-center gap-1 rounded-sm shadow-[0_0_20px_rgba(255,255,255,0.15)]"
           >
-            <span className="relative z-10">BUY</span>
+            <span className="relative z-10">КУПИТЬ</span>
           </Link>
         </div>
       </div>
@@ -268,14 +263,14 @@ export default function Home() {
   const heroScale = useTransform(smoothProgress, [0, 0.18], [1, 0.88]);
   const heroBlur = useTransform(smoothProgress, [0, 0.14], ["blur(0px)", "blur(24px)"]);
 
-  // Trailer 2
+  // Lookbook 1
   const trailer2Ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress: t2p } = useScroll({ target: trailer2Ref, offset: ["start end", "end start"] });
   const t2Scale = useTransform(t2p, [0, 0.45, 1], [0.82, 1, 0.94]);
   const t2Y = useTransform(t2p, [0, 1], ["-18%", "18%"]);
   const t2Opacity = useTransform(t2p, [0, 0.25, 0.75, 1], [0, 1, 1, 0]);
 
-  // Trailer 3
+  // Lookbook 2
   const trailer3Ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress: t3p } = useScroll({ target: trailer3Ref, offset: ["start end", "end start"] });
   const t3ImgScale = useTransform(t3p, [0, 0.5, 1], [1.35, 1, 1.12]);
@@ -287,63 +282,100 @@ export default function Home() {
   const finalScale = useTransform(finalP, [0, 0.5, 1], [0.9, 1, 1.05]);
   const finalOpacity = useTransform(finalP, [0, 0.3, 0.8], [0, 1, 1]);
 
+  // ТУТ ИЗМЕНЕНЫ ЦЕНЫ НА ЧИСЛА
   const categories: CategoryGroup[] = [
     {
       slug: "tshirts-hoodies",
-      categoryName: "T-Shirts & Hoodies",
+      categoryName: "Футболки и Худи",
       products: [
-        { id: 1, name: "Long Sleeve", priceUzs: "200 000 UZS", sizesDisplay: "XS, S, M, L", imageUrl: "/products/y2k-tee.jpg", tag: "HOT DROP" },
-        { id: 2, name: "Skeleton Long Sleeve", priceUzs: "220 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/skelet.jpg" },
-        { id: 3, name: "T-Shirt", priceUzs: "140 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/futbolka.jpg" },
-        { id: 4, name: "T-Shirt", priceUzs: "80 000 UZS", sizesDisplay: "XS, S, M, L", imageUrl: "/products/futbolochka.jpg" },
-        { id: 5, name: "Long Sleeve", priceUzs: "200 000 UZS", sizesDisplay: "XS, S, M, L", imageUrl: "/products/hoodie.jpg" },
-        { id: 6, name: "T-Shirt", priceUzs: "200 000 UZS", sizesDisplay: "M, L, XL, 2XL", imageUrl: "/products/pahan.jpg", tag: "LIMITED" },
-        // --- ДОБАВЛЕННЫЕ КАРТОЧКИ ---
-        { id: 22, name: "T-Shirt", priceUzs: "100 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/8.jpg" },
-        { id: 23, name: "T-Shirt", priceUzs: "100 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/9.jpg" },
-        { id: 24, name: "T-Shirt", priceUzs: "100 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/10.jpg" },
-        { id: 25, name: "T-Shirt", priceUzs: "100 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/11.jpg" },
-        { id: 26, name: "T-Shirt", priceUzs: "100 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/12.jpg" },
-        { id: 27, name: "T-Shirt", priceUzs: "100 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/13.png" },
+        { id: 1, name: "Лонгслив", priceUzs: 200000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/y2k-tee.jpg", tag: "ХИТ ДРОПА" },
+        { id: 2, name: "Лонгслив Skeleton", priceUzs: 220000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/skelet.jpg" },
+        { id: 3, name: "Футболка", priceUzs: 140000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/futbolka.jpg" },
+        { id: 4, name: "Футболка", priceUzs: 80000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/futbolochka.jpg" },
+        { id: 5, name: "Лонгслив", priceUzs: 200000, sizesDisplay: "XS, S, M, L", imageUrl: "/products/hoodie.jpg" },
+        { id: 6, name: "Футболка", priceUzs: 200000, sizesDisplay: "M, L, XL, 2XL", imageUrl: "/products/pahan.jpg", tag: "ЛИМИТКА" },
+        { id: 22, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/8.jpg" },
+        { id: 23, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/9.jpg" },
+        { id: 24, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/10.jpg" },
+        { id: 25, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/11.jpg" },
+        { id: 26, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/12.jpg" },
+        { id: 27, name: "Футболка", priceUzs: 100000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/13.png" },
+        { id: 28, name: "Футболка", priceUzs: 200000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/14.jpg" },
+        { id: 29, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/16.jpg" },
+        { id: 30, name: "Футболка", priceUzs: 120000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/17.jpg" },
       ],
     },
     {
       slug: "pants",
-      categoryName: "Pants",
+      categoryName: "Джинсы",
       products: [
-        { id: 7, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S - 2XL", imageUrl: "/products/jins.jpg", tag: "BESTSELLER" },
-        { id: 8, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/jinsik.jpg" },
-        { id: 9, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/1.jpg" },
-        { id: 10, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/2.jpg" },
-        { id: 11, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/3.jpg" },
-        { id: 12, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/4.jpg" },
-        { id: 13, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/5.jpg" },
-        { id: 14, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/6.jpg" },
-        { id: 15, name: "Pants", priceUzs: "250 000 UZS", sizesDisplay: "S, M, L, XL", imageUrl: "/products/7.jpg" },
+        { id: 7, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S - 2XL", imageUrl: "/products/jins.jpg", tag: "БЕСТСЕЛЛЕР" },
+        { id: 8, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/jinsik.jpg" },
+        { id: 9, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/1.jpg" },
+        { id: 10, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/2.jpg" },
+        { id: 11, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/3.jpg" },
+        { id: 12, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/4.jpg" },
+        { id: 13, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/5.jpg" },
+        { id: 14, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/6.jpg" },
+        { id: 15, name: "Джинсы", priceUzs: 250000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/7.jpg" },
+        { id: 31, name: "Джинсы", priceUzs: 200000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/18.jpg" },
+      ],
+    },
+    {
+      slug: "shorts",
+      categoryName: "Шорты",
+      products: [
+        { id: 32, name: "Шорты", priceUzs: 130000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/19.jpg" },
+      ],
+    },
+    {
+      slug: "sets",
+      categoryName: "Сеты",
+      products: [
+        { id: 33, name: "Сет", priceUzs: 130000, sizesDisplay: "S, M, L, XL", imageUrl: "/products/15.jpg" },
       ],
     },
     {
       slug: "footwear",
-      categoryName: "Footwear",
+      categoryName: "Обувь",
       products: [
-        { id: 16, name: "Footwear", priceUzs: "500 000 UZS", sizesDisplay: "35 – 46", allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"], imageUrl: "/products/shmot.jpg", tag: "NEW TECH" },
-        { id: 17, name: "Footwear", priceUzs: "500 000 UZS", sizesDisplay: "35 – 46", allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"], imageUrl: "/products/shmoti.jpg" },
+        { id: 16, name: "Кроссовки", priceUzs: 500000, sizesDisplay: "35 – 46", allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"], imageUrl: "/products/shmot.jpg", tag: "NEW TECH" },
+        { id: 17, name: "Кроссовки", priceUzs: 500000, sizesDisplay: "35 – 46", allSizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"], imageUrl: "/products/shmoti.jpg" },
       ],
     },
     {
       slug: "backpacks-bags",
-      categoryName: "Backpacks & Bags",
+      categoryName: "Рюкзаки и Сумки",
       products: [
-        { id: 18, name: "Backpack", priceUzs: "220 000 UZS", sizesDisplay: "One Size", imageUrl: "/products/rukzak.jpg" },
+        { id: 18, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/rukzak.jpg" },
+        { id: 34, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/20.png" },
+        { id: 35, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/21.png" },
+        { id: 36, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/22.png" },
+        { id: 37, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/23.png" },
+        { id: 38, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/24.png" },
+        { id: 39, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/25.png" },
+        { id: 40, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/26.png" },
+        { id: 41, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/27.png" },
+        { id: 42, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/28.png" },
+        { id: 43, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/29.png" },
+        { id: 44, name: "Рюкзак", priceUzs: 250000, sizesDisplay: "Единый размер", imageUrl: "/products/30.png" },
       ],
     },
     {
       slug: "accessories",
-      categoryName: "Accessories",
+      categoryName: "Аксессуары",
       products: [
-        { id: 19, name: "Crown", priceUzs: "30 000 UZS", sizesDisplay: "One Size", imageUrl: "/products/korona.jpg" },
-        { id: 20, name: "MP3 Player", priceUzs: "130 000 UZS", sizesDisplay: "One Size", imageUrl: "/products/mp3.jpg" },
-        { id: 21, name: "Headphones", priceUzs: "80 000 UZS", sizesDisplay: "One Size", imageUrl: "/products/naushi.jpg" },
+        { id: 19, name: "Корона", priceUzs: 30000, sizesDisplay: "Единый размер", imageUrl: "/products/korona.jpg" },
+        { id: 20, name: "MP3 Плеер", priceUzs: 130000, sizesDisplay: "Единый размер", imageUrl: "/products/mp3.jpg" },
+        { id: 21, name: "Наушники", priceUzs: 80000, sizesDisplay: "Единый размер", imageUrl: "/products/naushi.jpg" },
+        { id: 45, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/31.png" },
+        { id: 46, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/32.png" },
+        { id: 47, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/33.png" },
+        { id: 48, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/34.png" },
+        { id: 49, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/35.png" },
+        { id: 50, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/36.png" },
+        { id: 51, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/37.jpg" },
+        { id: 52, name: "Аксессуар", priceUzs: 120000, sizesDisplay: "Единый размер", imageUrl: "/products/38.jpg" },
       ],
     },
   ];
@@ -376,7 +408,6 @@ export default function Home() {
       if (!start) start = timestamp;
       const progress = timestamp - start;
       const t = Math.min(progress / duration, 1);
-      // Expo InOut cinematic
       const ease = t === 1 ? 1 : t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
       window.scrollTo(0, startPosition + distance * ease);
       if (progress < duration) window.requestAnimationFrame(step);
@@ -395,7 +426,7 @@ export default function Home() {
   const totalProducts = categories.reduce((acc, cat) => acc + cat.products.length, 0);
 
   return (
-    <main className="min-h-screen bg-[#020202] text-zinc-100 font-mono relative selection:bg-cyan-400 selection:text-black overflow-x-hidden">
+    <main className="min-h-screen bg-[#020202] text-zinc-100 font-mono relative selection:bg-white selection:text-black overflow-x-hidden">
       {/* PRELOADER */}
       <AnimatePresence>
         {!isLoaded && (
@@ -417,17 +448,17 @@ export default function Home() {
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 1.4, delay: 0.3, ease: cinematicEase }}
-              className="w-32 h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent origin-center"
+              className="w-32 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent origin-center"
             />
             <span className="text-[9px] tracking-[0.7em] text-zinc-500 uppercase">
-              INITIALIZING 120FPS ENGINE
+              ЗАГРУЗКА КОЛЛЕКЦИИ
             </span>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* FILM GRAIN */}
-      <div className="fixed inset-0 pointer-events-none z-40 opacity-[0.07] mix-blend-screen">
+      <div className="fixed inset-0 pointer-events-none z-40 opacity-[0.05] mix-blend-screen">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
           <filter id="noiseFilter">
             <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch" />
@@ -439,27 +470,10 @@ export default function Home() {
       {/* CINEMATIC VIGNETTE */}
       <div className="fixed inset-0 pointer-events-none z-30 bg-[radial-gradient(ellipse_at_center,transparent_5%,#000000_125%)]" />
 
-      {/* HUD OVERLAY */}
-      <div className="fixed inset-0 pointer-events-none z-20 hidden md:flex flex-col justify-between p-10 text-[9px] text-zinc-600 tracking-[0.45em] uppercase font-mono">
-        <div className="flex justify-between items-center">
-          <span className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse shadow-[0_0_12px_rgba(220,38,38,0.9)]" />
-            <span className="text-white font-bold">REC 4K HDR</span> // 120 FPS
-          </span>
-          <span>41.2995° N, 69.2401° E</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span>AUDIO CH1 [||||||||||||||||]</span>
-          <span>Y2K CINEMATIC SYSTEM v4.0</span>
-        </div>
-      </div>
-
-      {/* ═══ TRAILER 01 — HERO ═══ */}
+      {/* ═══ HERO SECTION ═══ */}
       <section className="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-[#020202]">
-        {/* Atmospheric light orbs */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] h-[95vw] max-w-[1100px] max-h-[1100px] bg-gradient-to-tr from-cyan-950/25 via-violet-950/15 to-transparent rounded-full blur-[180px] animate-[pulse_10s_ease-in-out_infinite] transform-gpu will-change-transform" />
-        <div className="absolute top-[20%] right-[10%] w-[40vw] h-[40vw] max-w-[400px] bg-cyan-900/10 rounded-full blur-[120px] transform-gpu" />
-
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] h-[95vw] max-w-[1100px] max-h-[1100px] bg-gradient-to-tr from-zinc-900/40 via-zinc-800/10 to-transparent rounded-full blur-[180px] animate-[pulse_10s_ease-in-out_infinite] transform-gpu will-change-transform" />
+        
         <motion.div
           style={{ y: heroY, opacity: heroOpacity, scale: heroScale, filter: heroBlur }}
           className="relative z-10 text-center px-5 w-full max-w-7xl mx-auto flex flex-col items-center transform-gpu will-change-transform"
@@ -471,14 +485,14 @@ export default function Home() {
             className="mb-10"
           >
             <span className="inline-flex items-center gap-3.5 px-7 py-2.5 border border-white/12 rounded-full text-[10px] sm:text-[11px] text-zinc-400 tracking-[0.55em] uppercase backdrop-blur-2xl bg-white/[0.03] shadow-[0_0_40px_rgba(255,255,255,0.04)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-              OFFICIAL TRAILER 01
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+              Y2K
             </span>
           </motion.div>
 
           <CinematicText
-            text="Y2K STREETWEAR"
-            className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black tracking-tighter text-white uppercase drop-shadow-[0_0_100px_rgba(255,255,255,0.18)] leading-[0.9]"
+            text="Y2K STORE"
+            className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black tracking-tighter text-white uppercase drop-shadow-[0_0_100px_rgba(255,255,255,0.1)] leading-[0.9]"
           />
 
           <motion.p
@@ -487,9 +501,9 @@ export default function Home() {
             transition={{ duration: 2.1, delay: 1.7, ease: cinematicEase }}
             className="mt-10 text-zinc-400 max-w-xl mx-auto text-xs sm:text-sm tracking-[0.28em] font-sans font-light leading-relaxed"
           >
-            THE NEW COLLECTION IS LIVE.
+            НОВАЯ КОЛЛЕКЦИЯ УЖЕ В ПРОДАЖЕ.
             <br className="sm:hidden" />
-            <span className="text-zinc-500">SCROLL TO ENTER THE EXPERIENCE.</span>
+            <span className="text-zinc-500"> ЛИСТАЙТЕ ВНИЗ ДЛЯ ПРОСМОТРА.</span>
           </motion.p>
         </motion.div>
 
@@ -500,27 +514,27 @@ export default function Home() {
           transition={{ duration: 2.2, delay: 2.8 }}
           className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-10"
         >
-          <span className="text-[9px] uppercase tracking-[0.5em] text-zinc-500 font-bold">EXPLORE</span>
+          <span className="text-[9px] uppercase tracking-[0.5em] text-zinc-500 font-bold">ИССЛЕДОВАТЬ</span>
           <div className="w-[1px] h-14 bg-white/10 overflow-hidden relative">
             <motion.div
               animate={{ y: ["-100%", "100%"] }}
               transition={{ repeat: Infinity, duration: 1.8, ease: "linear" }}
-              className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-cyan-400 to-transparent opacity-90"
+              className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-white to-transparent opacity-90"
             />
           </div>
         </motion.div>
       </section>
 
-      <MarqueeTicker text="Y2K STREETWEAR ✦ REBEL GENERATION ✦ NEW COLLECTION 2026 ✦ UNLIMITED DROP" />
+      <MarqueeTicker text="Y2K STREETWEAR ✦ БУНТАРСКИЙ ДУХ ✦ НОВАЯ КОЛЛЕКЦИЯ 2026 ✦ УНИКАЛЬНЫЙ ДРОП" />
 
-      {/* ═══ TRAILER 02 — LOOKBOOK ═══ */}
+      {/* ═══ LOOKBOOK 01 ═══ */}
       <section ref={trailer2Ref} className="relative py-36 px-5 sm:px-12 max-w-7xl mx-auto my-16 overflow-hidden">
         <motion.div
           style={{ scale: t2Scale, opacity: t2Opacity }}
           className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-[#040404] min-h-[640px] flex flex-col justify-end p-8 sm:p-20 shadow-[0_50px_120px_rgba(0,0,0,0.85)] transform-gpu will-change-transform"
         >
           <motion.div style={{ y: t2Y }} className="absolute inset-0 z-0 opacity-45 mix-blend-luminosity scale-110">
-            <Image src="/products/pahan.jpg" alt="Promo Trailer 2" fill className="object-cover" priority={false} />
+            <Image src="/products/pahan.jpg" alt="Lookbook" fill className="object-cover" priority={false} />
           </motion.div>
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent z-10" />
 
@@ -531,33 +545,33 @@ export default function Home() {
             transition={{ duration: 1.4, ease: cinematicEase }}
             className="relative z-20 max-w-2xl"
           >
-            <span className="inline-block px-3.5 py-1.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] tracking-[0.35em] font-bold uppercase mb-7 rounded-sm">
-              PROMO TRAILER // DROP 01
+            <span className="inline-block px-3.5 py-1.5 bg-white/10 border border-white/20 text-white text-[10px] tracking-[0.35em] font-bold uppercase mb-7 rounded-sm">
+              ПОСЛЕДНИЙ ДРОП
             </span>
             <h2 className="text-4xl sm:text-7xl font-black uppercase text-white tracking-tighter leading-[0.95] mb-7 drop-shadow-2xl">
-              CYBER CORE
+              Y2K
               <br />
-              <span className="text-zinc-600">LOOKBOOK ’26</span>
+              <span className="text-zinc-500">ЛУКБУК // 2026</span>
             </h2>
             <p className="text-xs sm:text-sm text-zinc-300 tracking-[0.22em] font-sans font-light mb-12 leading-relaxed max-w-lg">
-              Эксклюзивные оверсайз фасоны с диким Y2K духом. Ткани повышенной плотности, светоотражающая графика и анатомический крой.
+              Эксклюзивные оверсайз фасоны в эстетике нулевых. Плотные ткани, качественный крой и уникальный дизайн.
             </p>
             <button
               onClick={scrollToCatalog}
-              className="px-12 py-5 bg-white text-black font-black text-[11px] uppercase tracking-[0.45em] rounded-sm hover:bg-cyan-400 transition-all duration-600 active:scale-[0.97] transform-gpu shadow-2xl hover:shadow-[0_0_40px_rgba(34,211,238,0.5)]"
+              className="px-12 py-5 bg-white text-black font-black text-[11px] uppercase tracking-[0.45em] rounded-sm hover:bg-zinc-200 transition-all duration-600 active:scale-[0.97] transform-gpu shadow-2xl"
             >
               СМОТРЕТЬ ЛУКБУК →
             </button>
           </motion.div>
 
           <div className="absolute top-10 right-10 z-20 hidden sm:flex flex-col items-end text-[9px] text-zinc-500 tracking-[0.4em] font-bold gap-1">
-            <span>SCENARIO ID: #002</span>
-            <span>STATUS: LIMITED RELEASE</span>
+            <span>АРТИКУЛ: Y2K-001</span>
+            <span>СТАТУС: В НАЛИЧИИ</span>
           </div>
         </motion.div>
       </section>
 
-      {/* ═══ TRAILER 03 — HARDWARE ═══ */}
+      {/* ═══ LOOKBOOK 02 ═══ */}
       <section ref={trailer3Ref} className="relative py-28 px-5 sm:px-12 max-w-7xl mx-auto my-16 border-y border-white/[0.06] bg-[#020202]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20 items-center">
           <motion.div
@@ -571,18 +585,18 @@ export default function Home() {
             <motion.div style={{ scale: t3ImgScale }} className="relative w-full h-full will-change-transform">
               <Image
                 src="/products/shmot.jpg"
-                alt="Cyber Sneakers Highlight"
+                alt="Sneakers Highlight"
                 fill
                 className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-1200"
               />
             </motion.div>
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
             <div className="absolute bottom-10 left-10 z-10">
-              <span className="text-[10px] text-cyan-400 tracking-[0.55em] uppercase font-black block mb-2">
-                HARDWARE SERIES
+              <span className="text-[10px] text-white tracking-[0.55em] uppercase font-black block mb-2">
+                СВЕЖИЙ РЕЛИЗ
               </span>
-              <h4 className="text-2xl font-black text-white uppercase tracking-widest drop-shadow-lg">
-                CYBER SNEAKERS T-1
+              <h4 className="text-2xl font-black text-zinc-300 uppercase tracking-widest drop-shadow-lg">
+                МАССИВНЫЕ СИЛУЭТЫ
               </h4>
             </div>
           </motion.div>
@@ -595,25 +609,25 @@ export default function Home() {
             className="flex flex-col justify-center"
           >
             <span className="text-[10px] text-zinc-500 tracking-[0.55em] font-bold uppercase mb-5">
-              PROMO TRAILER // DROP 02
+              ОБУВЬ & АКСЕССУАРЫ
             </span>
             <h3 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white mb-9 leading-[1.05]">
-              TACTICAL GEAR &
+              НОВЫЙ ВЗГЛЯД НА
               <br />
-              <span className="text-cyan-400">FOOTWEAR</span>
+              <span className="text-zinc-500">УЛИЧНЫЙ СТИЛЬ</span>
             </h3>
             <p className="text-xs sm:text-sm text-zinc-400 tracking-[0.22em] font-sans font-light leading-relaxed mb-12">
-              Каждый элемент проработан до мелочей. Встроенная защита, регулируемые стропы и массивные силуэты из 2000-х.
+              Каждый элемент проработан до мелочей. Премиальные материалы, агрессивные подошвы и подлинный дух 2000-х в каждой паре.
             </p>
 
             <div className="grid grid-cols-2 gap-4 mb-12">
               <div className="p-5 border border-white/10 bg-white/[0.025] rounded-lg backdrop-blur-sm">
-                <span className="block text-[9px] text-zinc-500 uppercase tracking-widest mb-2 font-bold">SIZING RANGE</span>
+                <span className="block text-[9px] text-zinc-500 uppercase tracking-widest mb-2 font-bold">РАЗМЕРНЫЙ РЯД</span>
                 <span className="text-sm font-bold text-white tracking-widest">35 — 46 EU</span>
               </div>
               <div className="p-5 border border-white/10 bg-white/[0.025] rounded-lg backdrop-blur-sm">
-                <span className="block text-[9px] text-zinc-500 uppercase tracking-widest mb-2 font-bold">AVAILABILITY</span>
-                <span className="text-sm font-bold text-cyan-400 tracking-widest">IN STOCK</span>
+                <span className="block text-[9px] text-zinc-500 uppercase tracking-widest mb-2 font-bold">НАЛИЧИЕ</span>
+                <span className="text-sm font-bold text-white tracking-widest">ДОСТУПНО</span>
               </div>
             </div>
 
@@ -621,7 +635,7 @@ export default function Home() {
               onClick={scrollToCatalog}
               className="w-full sm:w-auto px-12 py-5 border border-white/20 hover:border-white text-white font-bold text-[11px] uppercase tracking-[0.45em] transition-all duration-600 rounded-sm text-center hover:bg-white hover:text-black"
             >
-              ПЕРЕЙТИ К ОБУВИ →
+              СМОТРЕТЬ ОБУВЬ →
             </button>
           </motion.div>
         </div>
@@ -669,7 +683,7 @@ export default function Home() {
           >
             <h3 className="text-xs sm:text-lg font-black tracking-[0.45em] text-white uppercase flex items-center gap-4">
               КАТАЛОГ <span className="text-zinc-700 font-light">/</span>
-              <span className="text-cyan-400">{totalProducts} ITEMS</span>
+              <span className="text-zinc-400">{totalProducts} ТОВАРОВ</span>
             </h3>
           </motion.div>
 
@@ -684,7 +698,7 @@ export default function Home() {
               >
                 <div className="flex items-center gap-7 text-sm sm:text-xl font-black tracking-[0.4em] text-zinc-200 uppercase w-full">
                   <span>{category.categoryName}</span>
-                  <div className="flex-1 h-[1px] bg-gradient-to-r from-cyan-500/35 to-transparent" />
+                  <div className="flex-1 h-[1px] bg-gradient-to-r from-zinc-500/35 to-transparent" />
                 </div>
               </motion.div>
 
@@ -714,11 +728,10 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ═══ FINAL CINEMATIC SCENE ═══ */}
+      {/* ═══ FINAL SCENE ═══ */}
       <section ref={finalRef} className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#010101]">
-        {/* Deep atmospheric background */}
         <div className="absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[80vh] bg-gradient-to-b from-cyan-950/20 via-violet-950/10 to-transparent rounded-full blur-[160px] transform-gpu" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[80vh] bg-gradient-to-b from-zinc-900/20 via-zinc-800/10 to-transparent rounded-full blur-[160px] transform-gpu" />
           <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black to-transparent" />
         </div>
 
@@ -734,12 +747,12 @@ export default function Home() {
             className="mb-8"
           >
             <span className="inline-block px-5 py-2 border border-white/15 rounded-full text-[10px] tracking-[0.5em] text-zinc-400 uppercase backdrop-blur-xl bg-white/[0.03]">
-              END CREDITS
+              Y2K STUDIO
             </span>
           </motion.div>
 
           <CinematicText
-            text="WEAR THE FUTURE"
+            text="ВЫБИРАЙ СТИЛЬ"
             className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-white uppercase leading-[0.95] mb-8"
           />
 
@@ -750,7 +763,7 @@ export default function Home() {
             transition={{ duration: 1.8, delay: 0.4, ease: cinematicEase }}
             className="text-zinc-400 text-xs sm:text-sm tracking-[0.3em] font-sans font-light mb-14 max-w-lg mx-auto leading-relaxed"
           >
-            Limited drops. No restocks. Be part of the generation that redefined streetwear.
+            Ограниченный тираж. Уникальный дизайн. Стань частью поколения, выбирающего качество и комфорт.
           </motion.p>
 
           <motion.div
@@ -762,9 +775,9 @@ export default function Home() {
           >
             <button
               onClick={scrollToCatalog}
-              className="px-14 py-5 bg-white text-black font-black text-[12px] uppercase tracking-[0.4em] rounded-sm hover:bg-cyan-400 transition-all duration-600 shadow-[0_0_50px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(34,211,238,0.5)] active:scale-[0.97]"
+              className="px-14 py-5 bg-white text-black font-black text-[12px] uppercase tracking-[0.4em] rounded-sm hover:bg-zinc-200 transition-all duration-600 shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.97]"
             >
-              SHOP THE DROP
+              ПЕРЕЙТИ К ПОКУПКАМ
             </button>
             <a
               href="https://t.me/y2kstore"
@@ -783,7 +796,7 @@ export default function Home() {
             transition={{ duration: 2, delay: 1.2 }}
             className="mt-20 text-[9px] tracking-[0.6em] text-zinc-600 uppercase"
           >
-            Y2K STUDIO © 2026 — CINEMATIC EXPERIENCE
+            Y2K STUDIO © 2026 — ALL RIGHTS RESERVED
           </motion.p>
         </motion.div>
       </section>
@@ -819,7 +832,7 @@ export default function Home() {
                   ✕
                 </button>
               </div>
-              <p className="text-[10px] text-cyan-400 font-bold tracking-[0.3em] uppercase mb-5 border-b border-white/10 pb-3">
+              <p className="text-[10px] text-zinc-400 font-bold tracking-[0.3em] uppercase mb-5 border-b border-white/10 pb-3">
                 ВЫБЕРИТЕ РАЗМЕР
               </p>
               <div className="grid grid-cols-3 gap-3 mb-8">

@@ -24,7 +24,6 @@ const TASHKENT_DISTRICTS = [
   "Таш. область (Пригород)",
 ];
 
-// Улучшенная плавная кривая для эффекта "дорогой" анимации
 const cinematicEase = [0.16, 1, 0.3, 1] as const;
 
 const staggerContainer = {
@@ -46,7 +45,6 @@ const fadeUpBlur = {
   },
 };
 
-// --- КОМПОНЕНТ ШУМА (КИНОПЛЕНКА) ---
 function FilmNoise() {
   return (
     <div 
@@ -58,7 +56,6 @@ function FilmNoise() {
   );
 }
 
-// --- УЛУЧШЕННЫЙ ЗВЕЗДНЫЙ ПОЛЕТ (ГЛОУ И 120FPS) ---
 function StarField() {
   const stars = useRef(
     Array.from({ length: 60 }).map(() => ({
@@ -67,13 +64,12 @@ function StarField() {
       size: Math.random() * 2.5 + 0.5,
       duration: Math.random() * 2 + 1.2,
       delay: Math.random() * 2,
-      glow: Math.random() > 0.5 ? "rgba(255, 255, 255, 0.8)" : "rgba(167, 139, 250, 0.6)", // Белый или легкий фиолетовый оттенок
+      glow: Math.random() > 0.5 ? "rgba(255, 255, 255, 0.8)" : "rgba(167, 139, 250, 0.6)",
     }))
   ).current;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-black">
-      {/* Глубокий кинематографичный свет на фоне */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-indigo-900/10 blur-[120px] rounded-full" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30vw] h-[30vw] bg-cyan-900/10 blur-[80px] rounded-full" />
       
@@ -109,7 +105,6 @@ function StarField() {
   );
 }
 
-// --- КИНЕМАТОГРАФИЧНЫЙ ВЫПАДАЮЩИЙ СПИСОК ---
 function CinematicSelect({ label, options, value, onChange }: any) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -137,7 +132,6 @@ function CinematicSelect({ label, options, value, onChange }: any) {
         <span className="truncate relative z-10">{value} район</span>
         <span className={`text-zinc-500 text-xs transition-transform duration-500 relative z-10 ${isOpen ? "rotate-180" : "rotate-0"}`}>▼</span>
         
-        {/* Анимированная подсветка снизу */}
         <div className={`absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-indigo-500 via-cyan-400 to-indigo-500 transition-all duration-500 ${isOpen ? "w-full opacity-100" : "w-0 opacity-0"}`} />
       </button>
 
@@ -176,7 +170,6 @@ function CinematicSelect({ label, options, value, onChange }: any) {
   );
 }
 
-// --- ПОЛЕ ВВОДА С НЕОНОВЫМ ФОКУСОМ ---
 function CinematicField({ label, value, onChange, placeholder, type = "text", required = false, disabled = false }: any) {
   return (
     <label className="block group relative">
@@ -195,7 +188,6 @@ function CinematicField({ label, value, onChange, placeholder, type = "text", re
             disabled ? "opacity-50 cursor-not-allowed" : "focus:border-white/30"
           }`}
         />
-        {/* Светящаяся полоса при фокусе */}
         {!disabled && (
           <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 group-focus-within:w-full transition-all duration-700 ease-out" />
         )}
@@ -223,7 +215,6 @@ function CheckoutContent() {
     fullName: "", phone: "+998 ", email: "", district: TASHKENT_DISTRICTS[0], street: "", house: "", apartment: "", landmark: "",
   });
 
-  // Автоматический пропуск промо-заставки через 3 секунды
   useEffect(() => {
     if (step === "promo") {
       const timer = setTimeout(() => setStep("form"), 3200);
@@ -245,8 +236,10 @@ function CheckoutContent() {
     if (e.target.files && e.target.files[0]) setReceiptFile(e.target.files[0]);
   };
 
+  // --- ИСПРАВЛЕННАЯ ЛОГИКА ОТПРАВКИ ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!receiptFile) {
       alert("⚠️ Пожалуйста, прикрепите скриншот чека об оплате.");
       return;
@@ -254,38 +247,88 @@ function CheckoutContent() {
 
     setStep("processing");
 
+    const BOT_TOKEN = "8888538637:AAGu1hLNqbGMDXxeHQOMuiL79QhbPQlLsZA"; 
+    const CHAT_ID = "6613038560";
+
+    const orderDetails = `
+🔥 НОВЫЙ ЗАКАЗ (Y2K STORE) 🔥
+
+🛍 Товар: ${productName}
+📏 Размер: ${selectedSize}
+💰 Цена: ${numericPrice} UZS
+
+👤 Клиент: ${form.fullName}
+📞 Телефон: ${form.phone}
+✉️ Email: ${form.email}
+
+📍 Адрес доставки:
+Город: Ташкент
+Район: ${form.district}
+Улица: ${form.street}
+Дом: ${form.house} ${form.apartment ? `, Кв/Офис: ${form.apartment}` : ""}
+Ориентир: ${form.landmark || "Нет ориентира"}
+    `;
+
     try {
-      const formData = new FormData();
-      Object.entries(form).forEach(([key, val]) => formData.append(key, val));
-      formData.append("productName", productName);
-      formData.append("size", selectedSize);
-      formData.append("price", productPriceRaw);
-      formData.append("receipt", receiptFile);
+      // 1. ОТПРАВЛЯЕМ ФОТО ТОВАРА (превращаем productImg в файл для localhost) + ТЕКСТ
+      let productSent = false;
+      try {
+        const imgResponse = await fetch(productImg);
+        const imgBlob = await imgResponse.blob();
+        
+        const productFormData = new FormData();
+        productFormData.append("chat_id", CHAT_ID);
+        productFormData.append("photo", imgBlob, "product.jpg"); 
+        productFormData.append("caption", orderDetails);
 
-      const res = await fetch("/api/checkout", { method: "POST", body: formData });
+        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+          method: "POST",
+          body: productFormData,
+        });
+        if (res.ok) productSent = true;
+      } catch (e) {
+        console.warn("Не удалось отправить картинку товара, отправляем текст:", e);
+      }
 
-      if (res.ok) {
+      // Если картинка почему-то не загрузилась, бот просто отправит текст заказа
+      if (!productSent) {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: CHAT_ID, text: orderDetails }),
+        });
+      }
+
+      // 2. ОТПРАВЛЯЕМ СКРИНШОТ ЧЕКА
+      const receiptFormData = new FormData();
+      receiptFormData.append("chat_id", CHAT_ID);
+      receiptFormData.append("photo", receiptFile);
+      receiptFormData.append("caption", `🧾 Скриншот чека об оплате от: ${form.fullName}`);
+
+      const receiptRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+        method: "POST",
+        body: receiptFormData, 
+      });
+
+      if (receiptRes.ok) {
         setStep("success");
       } else {
-        alert("Ошибка отправки заказа. Повторите попытку.");
-        setStep("form");
+        throw new Error("Ошибка при отправке чека");
       }
     } catch (err) {
       console.error(err);
-      alert("Сетевая ошибка. Проверьте подключение.");
-      setStep("form");
+      alert("Ошибка отправки заказа. Проверьте подключение и токен Telegram бота.");
+      setStep("form"); 
     }
   };
 
   return (
     <main className="min-h-screen bg-[#050505] text-zinc-200 font-sans relative overflow-x-hidden selection:bg-cyan-500 selection:text-black">
       
-      {/* 🚀 VFX: Фоновый свет, Звезды и Кинопленка */}
       <StarField />
       <FilmNoise />
 
       <AnimatePresence mode="wait">
-        {/* 🎬 МИНИ-ТРЕЙЛЕР ИНТРО (Cinematic Director's Cut) */}
         {step === "promo" && (
           <motion.div
             key="promo"
@@ -330,7 +373,6 @@ function CheckoutContent() {
           </motion.div>
         )}
 
-        {/* 📝 ОСНОВНАЯ ФОРМА СО ВСЕМИ ПОЛЯМИ */}
         {(step === "form" || step === "processing") && (
           <motion.div
             key="checkout"
@@ -358,10 +400,8 @@ function CheckoutContent() {
 
             <motion.form variants={staggerContainer} initial="hidden" animate="show" onSubmit={handleSubmit} className="flex flex-col xl:flex-row gap-12 xl:gap-20 flex-grow">
               
-              {/* ЛЕВАЯ КОЛОНКА: ТОВАР */}
               <motion.div variants={fadeUpBlur} className="w-full xl:w-5/12">
                 <div className="xl:sticky xl:top-12 bg-black/40 backdrop-blur-3xl p-8 sm:p-10 border border-white/5 shadow-[0_30px_60px_rgba(0,0,0,0.8)] relative overflow-hidden group">
-                  {/* Фоновый свет карточки */}
                   <div className="absolute -top-32 -right-32 w-64 h-64 bg-white/5 blur-[100px] rounded-full pointer-events-none transition-all duration-1000 group-hover:bg-white/10" />
                   
                   <h2 className="text-[10px] font-bold tracking-[0.2em] mb-8 text-zinc-500 uppercase">Детали заказа</h2>
@@ -409,10 +449,8 @@ function CheckoutContent() {
                 </div>
               </motion.div>
 
-              {/* ПРАВАЯ КОЛОНКА: АНКЕТА */}
               <div className="w-full xl:w-7/12 space-y-16 pb-20">
                 
-                {/* 1. КОНТАКТЫ */}
                 <motion.fieldset variants={fadeUpBlur} className="space-y-6">
                   <legend className="text-xs text-white font-light tracking-[0.3em] uppercase border-b border-white/10 pb-6 w-full flex items-center gap-4">
                     <span className="text-zinc-600 font-mono">01</span> Контакты
@@ -424,7 +462,6 @@ function CheckoutContent() {
                   </div>
                 </motion.fieldset>
 
-                {/* 2. АДРЕС */}
                 <motion.fieldset variants={fadeUpBlur} className="space-y-6">
                   <legend className="text-xs text-white font-light tracking-[0.3em] uppercase border-b border-white/10 pb-6 w-full flex justify-between items-center">
                     <div className="flex items-center gap-4"><span className="text-zinc-600 font-mono">02</span> Локация</div>
@@ -445,7 +482,6 @@ function CheckoutContent() {
                   <CinematicField label="Ориентир (необязательно)" value={form.landmark} onChange={(v: string) => handleChange("landmark", v)} placeholder="Что рядом?" />
                 </motion.fieldset>
 
-                {/* 3. ОПЛАТА */}
                 <motion.fieldset variants={fadeUpBlur} className="space-y-6">
                   <legend className="text-xs text-white font-light tracking-[0.3em] uppercase border-b border-white/10 pb-6 w-full flex items-center gap-4">
                     <span className="text-zinc-600 font-mono">03</span> Транзакция
@@ -475,14 +511,12 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  {/* DROPZONE */}
                   <div className="pt-4">
                     <label className={`group relative flex flex-col items-center justify-center w-full min-h-[160px] border border-dashed cursor-pointer transition-all duration-700 overflow-hidden ${
                       receiptFile 
                         ? "border-emerald-500 bg-emerald-950/10 text-emerald-300 shadow-[0_0_30px_-5px_rgba(16,185,129,0.2)]" 
                         : "border-white/20 bg-black/40 hover:bg-white/[0.02] hover:border-white/50 text-zinc-500"
                     }`}>
-                      {/* Эффект сканирования при наведении */}
                       {!receiptFile && <div className="absolute top-0 left-0 w-full h-[1px] bg-cyan-400/50 shadow-[0_0_10px_#22d3ee] -translate-y-full group-hover:animate-[scan_2s_ease-in-out_infinite]" />}
                       
                       <div className="flex flex-col items-center justify-center p-8 text-center relative z-10">
@@ -499,12 +533,10 @@ function CheckoutContent() {
                   </div>
                 </motion.fieldset>
 
-                {/* КНОПКА САБМИТА (Cinematic Shimmer) */}
                 <motion.button
                   variants={fadeUpBlur} type="submit" disabled={step === "processing"}
                   className="relative group w-full py-6 mt-10 bg-white text-black text-xs font-bold uppercase tracking-[0.4em] overflow-hidden transition-all duration-500 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-wait shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.3)]"
                 >
-                  {/* Блик пробегающий по кнопке */}
                   <div className="absolute inset-0 -translate-x-[150%] bg-gradient-to-r from-transparent via-white/80 to-transparent group-hover:animate-[shimmer_1.5s_infinite_ease-in-out] mix-blend-difference" />
                   
                   <span className="relative z-10">
@@ -516,7 +548,6 @@ function CheckoutContent() {
           </motion.div>
         )}
 
-        {/* 🎉 УСПЕХ (Epic Ending) */}
         {step === "success" && (
           <motion.div
             key="success"
@@ -525,7 +556,6 @@ function CheckoutContent() {
             transition={{ duration: 2, ease: cinematicEase }}
             className="relative z-20 min-h-screen flex flex-col items-center justify-center text-center px-4 bg-black"
           >
-            {/* Громадное фоновое свечение успеха */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-emerald-900/10 blur-[150px] rounded-full pointer-events-none" />
 
             <div className="space-y-8 mb-16 relative z-10">
@@ -550,7 +580,6 @@ function CheckoutContent() {
         )}
       </AnimatePresence>
 
-      {/* Tailwind Animations Injection (чтобы не трогать tailwind.config.js) */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes shimmer {
           100% { transform: translateX(150%); }
